@@ -62,8 +62,20 @@ Required changes from this repo's `config/Macro.cfg`:
 | Macro | Change |
 |---|---|
 | `G28` | Check `'calibrate' in eddy config` (not `printer.probe.is_calibrated` — mainline lacks that) |
-| `PRINT_START` | `SET_GCODE_OFFSET Z=0` → `BED_LOADCELL_Z_OFFSET` → `G28 Z` |
+| `PRINT_START` | `SET_GCODE_OFFSET Z=0` → `BED_LOADCELL_Z_OFFSET` → `G28 Z` → `LINE_PURGE` |
 | `END_PRINT` | Remove `PROBE_EDDY_NG_SET_TAP_OFFSET` |
+
+## Line purge (SimpleAF-style KAMP)
+
+Add to your slicer start gcode **before** `PRINT_START` so Moonraker injects object bounds:
+
+```gcode
+M117
+PRINT_START BED=[first_layer_bed_temperature] HOTEND=[first_layer_temperature]
+```
+
+Tune at runtime: `SETUP_LINE_PURGE PURGE_AMOUNT=40 FLOW_RATE=12`  
+Skip once: `LINE_PURGE PURGE=0`
 
 ## 5. Restart
 
