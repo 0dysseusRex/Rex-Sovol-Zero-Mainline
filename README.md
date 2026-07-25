@@ -1,6 +1,6 @@
 # Rex-Sovol-Zero-Mainline
 
-Sovol Zero on **mainline Klipper** — eddy probe Z homing + bed load cell Z offset.
+If your **Sovol Zero** is already on mainline Klipper, this repo provides the config and Python modules to use the stock probing hardware properly. The toolhead eddy probe handles Z homing and bed mesh; the bed load cell fine-tunes nozzle height with a nozzle touch; axis twist compensation calibrates both so your first layer stays consistent across the bed.
 
 ## Support
 
