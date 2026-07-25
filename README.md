@@ -44,6 +44,11 @@ scripts/
 
 ## Quick install
 
+```bash
+git clone https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline.git
+cd Rex-Sovol-Zero-Mainline
+```
+
 1. Copy `klipper/extras/probe_pressure.py` into your Klipper tree:
    ```bash
    ./scripts/install-probe-pressure.sh ~/klipper

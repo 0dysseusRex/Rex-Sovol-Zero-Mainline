@@ -9,8 +9,8 @@
 ## 1. Install probe_pressure.py
 
 ```bash
-git clone <this-repo>
-cd sovol-zero-mainline-klipper
+git clone https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline.git
+cd Rex-Sovol-Zero-Mainline
 ./scripts/install-probe-pressure.sh ~/klipper
 ```
 
