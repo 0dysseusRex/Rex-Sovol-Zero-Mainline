@@ -1,6 +1,8 @@
 # Rex-Sovol-Zero-Mainline
 
-**New to mainline Klipper?** See the full migration wiki: **[OEM → Mainline Klipper on the Sovol Zero](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline/wiki)** — step-by-step guide for SSH, ST-LINK, Armbian, MCU flashing, and calibration (with recovery links to [asnajder/zero-config](https://github.com/asnajder/zero-config/tree/main/recovery)).
+**New to mainline Klipper?** See the full migration wiki: **[OEM → Mainline Klipper on the Sovol Zero](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline/wiki)** — SSH, ST-LINK, Armbian, MCU flashing, and calibration.
+
+**Probing paths:** The default Rex config uses **eddy + bed load cell** for fine Z offset. Printers **without** a load cell should follow the wiki’s **[Eddy-Only Configuration](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline/wiki/Eddy-Only-Configuration)** page.
 
 If your **Sovol Zero** is already on mainline Klipper, this repo provides the config and Python modules to use the stock probing hardware properly.
 

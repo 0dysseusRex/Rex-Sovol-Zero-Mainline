@@ -14,8 +14,9 @@
 - [CAN Bus and MCU Flashing](CAN-Bus-and-MCU-Flashing)
 
 ### Software setup
-- [Configuration and Rex Repo](Configuration-and-Rex-Repo)
-- [Calibration](Calibration)
+- [Configuration and Rex Repo](Configuration-and-Rex-Repo) — **Path A: eddy + load cell**
+- [Eddy-Only Configuration](Eddy-Only-Configuration) — **Path B: no load cell**
+- [Calibration](Calibration) — Path A calibration
 
 ### Help
 - [Troubleshooting](Troubleshooting)

@@ -5,9 +5,32 @@
 It is written for people who are **new to SSH, Linux, and ST-LINK**. Every major step explains **what you are doing and why**.
 
 > **Scope:** This guide covers the **full migration** (host OS, MCU firmware, CAN, configs, calibration).  
-> After mainline Klipper is running, install **[Rex-Sovol-Zero-Mainline](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline)** for the recommended eddy + bed load cell configuration used on this wiki.
+> After mainline Klipper is running, install **[Rex-Sovol-Zero-Mainline](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline)** for the recommended probing setup.
 
 ---
+
+## Load cell vs eddy-only — choose your path
+
+**Most of this wiki (and the Rex repo defaults) configure the bed load cell for fine Z offset** — a strain gauge under the bed (~X25 Y20) that detects nozzle contact. That gives repeatable first-layer height on top of eddy homing and mesh.
+
+**Some Sovol Zero units shipped without a bed load cell.** If yours has no load cell hardware, use the **eddy-only branch**: homing, mesh, and Z offset all come from the toolhead **eddy probe** (`probe_eddy_current`) — no `probe_pressure`, no nozzle touch at print start.
+
+| | **Path A — Eddy + load cell** (default) | **Path B — Eddy only** (no load cell) |
+|---|---|---|
+| **Hardware** | Toolhead eddy + bed load cell (PD9/PD10) | Toolhead eddy only |
+| **Z homing** | Eddy | Eddy |
+| **Bed mesh** | Eddy scan | Eddy scan |
+| **Fine Z / first layer** | Load cell touch in `PRINT_START` | Eddy tap cal + baby-step |
+| **Rex configs** | `sovol_eddy.cfg` + `probe_pressure.cfg` | `sovol_eddy.cfg` only |
+| **Wiki pages** | [Configuration](Configuration-and-Rex-Repo) → [Calibration](Calibration) | **[Eddy-Only Configuration](Eddy-Only-Configuration)** |
+
+Phases **1–5** (backup, Armbian, KIAUH, CAN, MCU flash) are the **same for both paths**.
+
+```
+                    ┌── Path A (load cell) ──► Config + Cal (default)
+Phase 6–7 ──────────┤
+                    └── Path B (eddy only) ──► Eddy-Only Configuration
+```
 
 ## What changes when you migrate?
 
@@ -16,7 +39,7 @@ It is written for people who are **new to SSH, Linux, and ST-LINK**. Every major
 | Klipper source | Sovol fork with custom modules | Official [Klipper](https://github.com/Klipper3d/klipper) |
 | Host OS | Sovol image on CB1 eMMC | [Armbian](https://www.armbian.com/bigtreetech-cb1/) (recommended) |
 | Z homing | Vendor `[z_offset_calibration]` | `[probe_eddy_current]` (non-contact eddy probe) |
-| Fine Z offset | Vendor tap / load cell flow | `[probe_pressure]` (bed load cell nozzle touch) |
+| Fine Z offset | Vendor tap / load cell flow | **Path A:** `[probe_pressure]` bed load cell · **Path B:** eddy tap cal only ([Eddy-Only](Eddy-Only-Configuration)) |
 | Web UI | Mainsail (usually) | Mainsail + Moonraker (reinstalled via KIAUH) |
 | MCU firmware | Sovol prebuilt | Katapult bootloader + mainline Klipper bins |
 | Warranty | Stock firmware only | Sovol warns third-party firmware may void warranty — proceed at your own risk |
@@ -60,7 +83,7 @@ It is written for people who are **new to SSH, Linux, and ST-LINK**. Every major
 └───────────────────────────────┬─────────────────────────────────┘
                                 ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  PHASE 7 — Calibrate eddy probe, load cell, axis twist          │
+│  PHASE 7 — Calibrate (Path A: eddy + load cell · Path B: eddy) │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -77,8 +100,9 @@ It is written for people who are **new to SSH, Linux, and ST-LINK**. Every major
 | 5 | [Host Setup (CB1 / Armbian)](Host-Setup-CB1-Armbian) | Flash eMMC, first boot, create user, fix boot delays |
 | 6 | [Installing the Klipper Stack](Installing-the-Klipper-Stack) | KIAUH, Katapult, Moonraker timelapse, dependencies |
 | 7 | [CAN Bus and MCU Flashing](CAN-Bus-and-MCU-Flashing) | UUID discovery, menuconfig values, flash all three MCUs |
-| 8 | [Configuration and Rex Repo](Configuration-and-Rex-Repo) | Merge configs, install probe_pressure, display menus |
-| 9 | [Calibration](Calibration) | Eddy bootstrap, load cell Z, axis twist, first print |
+| 8 | [Configuration and Rex Repo](Configuration-and-Rex-Repo) | Merge configs — **default: eddy + load cell** |
+| 8b | [Eddy-Only Configuration](Eddy-Only-Configuration) | **Alternate:** no bed load cell |
+| 9 | [Calibration](Calibration) | Path A: load cell + eddy cal |
 | 10 | [Troubleshooting](Troubleshooting) | Common errors and fixes |
 | 11 | [Credits and Resources](Credits-and-Resources) | Repos, docs, and people who made this possible |
 

@@ -38,8 +38,9 @@ Start reading at [Home.md](Home.md) (renders as wiki **Home** page).
 | `Host-Setup-CB1-Armbian.md` | Host Setup (CB1 / Armbian) |
 | `Installing-the-Klipper-Stack.md` | Installing the Klipper Stack |
 | `CAN-Bus-and-MCU-Flashing.md` | CAN Bus and MCU Flashing |
-| `Configuration-and-Rex-Repo.md` | Configuration and Rex Repo |
-| `Calibration.md` | Calibration |
+| `Configuration-and-Rex-Repo.md` | Configuration and Rex Repo (Path A — load cell) |
+| `Eddy-Only-Configuration.md` | Eddy-Only Configuration (Path B — no load cell) |
+| `Calibration.md` | Calibration (Path A) |
 | `Troubleshooting.md` | Troubleshooting |
 | `Credits-and-Resources.md` | Credits and Resources |
 | `_Sidebar.md` | Wiki sidebar navigation |

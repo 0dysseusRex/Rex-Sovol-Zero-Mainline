@@ -1,6 +1,9 @@
 # Configuration and Rex Repo
 
-Once Klipper connects to MCUs, you need **configuration files** telling it about the Zero's hardware. This page covers the baseline from [asnajder/zero-config](https://github.com/asnajder/zero-config) plus the **[Rex-Sovol-Zero-Mainline](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline)** layer for eddy + bed load cell.
+Once Klipper connects to MCUs, you need **configuration files** telling it about the Zero's hardware. This page covers the baseline from [asnajder/zero-config](https://github.com/asnajder/zero-config) plus the **[Rex-Sovol-Zero-Mainline](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline)** layer.
+
+> **This page is Path A (default): eddy probe + bed load cell for fine Z offset.**  
+> Some printers shipped **without** a bed load cell → follow **[Eddy-Only Configuration](Eddy-Only-Configuration)** instead (eddy homing, mesh, and tap-cal Z offset only).
 
 ---
 
@@ -9,13 +12,16 @@ Once Klipper connects to MCUs, you need **configuration files** telling it about
 | Layer | Repo | When |
 |---|---|---|
 | **Base mainline Zero** | [asnajder/zero-config](https://github.com/asnajder/zero-config) configs | First Klipper start after MCU flash |
-| **Eddy + load cell tuning** | [Rex-Sovol-Zero-Mainline](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline) | After base Klipper runs |
+| **Eddy + load cell tuning** | [Rex-Sovol-Zero-Mainline](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline) | After base Klipper runs — **requires bed load cell** |
+| **Eddy only (no load cell)** | Rex `sovol_eddy.cfg` + zero-config baseline | See [Eddy-Only Configuration](Eddy-Only-Configuration) |
 
 **Do not overwrite** your entire `printer.cfg` with any single repo — merge sections and keep your `SAVE_CONFIG` block.
 
 ---
 
-## Architecture (why Rex config exists)
+## Architecture (Path A — load cell for fine Z)
+
+This is the **default Rex config**. It uses the bed load cell for a nozzle touch at print start to set fine Z offset; the eddy probe still handles homing and mesh.
 
 ```
 G28 X Y  →  G28 Z (eddy, non-contact)  →  PRINT_START  →  load cell touch  →  G28 Z  →  mesh
@@ -24,16 +30,18 @@ G28 X Y  →  G28 Z (eddy, non-contact)  →  PRINT_START  →  load cell touch 
 | Function | Module | Hardware |
 |---|---|---|
 | Z homing + mesh | `probe_eddy_current` | Toolhead LDC1612 eddy |
-| Fine first-layer Z | `probe_pressure` | Bed strain gauge (PD9/PD10) |
+| Fine first-layer Z | `probe_pressure` | Bed strain gauge (PD9/PD10) — **not on all printers** |
 | Axis twist cal | `axis_twist_pressure` | Eddy at offset + load cell touch |
 
 **G28 never uses the load cell** — same pattern as Cartographer-style scan homing.
+
+**No load cell?** You only need the eddy column — see [Eddy-Only Configuration](Eddy-Only-Configuration).
 
 Details: [Rex README](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline#architecture)
 
 ---
 
-## Install Rex Klipper extras
+## Install Rex Klipper extras (load cell path only)
 
 SSH into printer:
 
@@ -46,11 +54,13 @@ cd Rex-Sovol-Zero-Mainline
 
 **Why Python extras?** Mainline Klipper doesn't include Sovol's bed load cell module. This script copies `probe_pressure.py` and `axis_twist_pressure.py` into `~/klipper/klippy/extras/`.
 
+**Skip this entire step** if you have no load cell — you don't need `probe_pressure.py`. See [Eddy-Only Configuration](Eddy-Only-Configuration).
+
 Klipper may show **"dirty"** version — normal with untracked extras ([KLIPPER_UPDATES.md](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline/blob/master/docs/KLIPPER_UPDATES.md)).
 
 ---
 
-## Copy config snippets
+## Copy config snippets (Path A)
 
 ```bash
 cp ~/Rex-Sovol-Zero-Mainline/config/sovol_eddy.cfg ~/printer_data/config/
@@ -59,6 +69,8 @@ cp ~/Rex-Sovol-Zero-Mainline/config/GP3D_Macro.cfg ~/printer_data/config/
 cp ~/Rex-Sovol-Zero-Mainline/config/Rex_Macros.cfg ~/printer_data/config/
 cp ~/Rex-Sovol-Zero-Mainline/config/display_macros.cfg ~/printer_data/config/
 ```
+
+**Eddy-only:** copy only `sovol_eddy.cfg` — omit `probe_pressure.cfg`. Details: [Eddy-Only Configuration](Eddy-Only-Configuration).
 
 Optional:
 ```bash
@@ -176,14 +188,18 @@ If you don't have a working merged config yet, start from [asnajder/zero-config 
 sudo systemctl restart klipper
 ```
 
-Mainsail → Machine tab → verify objects exist:
+Mainsail → Machine tab → verify objects exist (Path A):
+
 - `probe_eddy_current eddy`
 - `probe_pressure`
 - `gcode_macro BED_LOADCELL_Z_OFFSET`
 - `gcode_macro EDDY_CALIBRATE_PREP`
 
+**Eddy-only:** only `probe_eddy_current eddy` is required — no `probe_pressure` objects.
+
 ---
 
 ## Next step
 
-→ **[Calibration](Calibration)** — mandatory before first print
+→ **[Calibration](Calibration)** — Path A (load cell)  
+→ **[Eddy-Only Configuration](Eddy-Only-Configuration)** — Path B (no load cell)

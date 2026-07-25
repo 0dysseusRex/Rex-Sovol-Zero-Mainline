@@ -1,6 +1,9 @@
 # Calibration
 
-Mainline eddy probing has a **bootstrap problem**: `G28 Z` needs calibration data, but calibration needs Z moves. The Rex config solves this with the **bed load cell** for one-time setup, then eddy handles everyday homing.
+> **Path A (this page):** printers **with** a bed load cell — fine Z offset via nozzle touch.  
+> **Path B (no load cell):** → **[Eddy-Only Configuration](Eddy-Only-Configuration)** — eddy tap cal and mesh only.
+
+Mainline eddy probing has a **bootstrap problem**: `G28 Z` needs calibration data, but calibration needs Z moves. The Rex **load cell path** uses the bed sensor for one-time bootstrap and per-print fine Z; eddy handles everyday homing and mesh.
 
 Full reference: [Rex CALIBRATION.md](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline/blob/master/docs/CALIBRATION.md)
 
@@ -8,7 +11,7 @@ Official eddy docs: [klipper3d.org — Eddy Probe](https://www.klipper3d.org/Edd
 
 ---
 
-## Calibration order (do not skip steps)
+## Calibration order — Path A with load cell (do not skip steps)
 
 ```
 1. EDDY_CALIBRATE_PREP        (load cell bootstrap — once)
@@ -25,6 +28,8 @@ Run from **Mainsail console** unless using display menus (Prepare → Calibratio
 ---
 
 ## Step 1 — Bootstrap Z with load cell
+
+Requires bed load cell hardware (PD9/PD10). **No load cell?** Use `SET_KINEMATIC_POSITION` bootstrap on the [Eddy-Only](Eddy-Only-Configuration#step-1--bootstrap-z-no-load-cell) page instead of this step.
 
 ```
 EDDY_CALIBRATE_PREP

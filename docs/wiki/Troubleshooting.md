@@ -104,7 +104,13 @@ Run `EDDY_CALIBRATE_PREP` or `SET_KINEMATIC_POSITION Z=<known>`
 
 ---
 
-## Load cell / probe_pressure
+## Load cell / probe_pressure (Path A only)
+
+Skip this section if you have **no bed load cell** — see [Eddy-Only Configuration](Eddy-Only-Configuration).
+
+### `Unknown command: RUN_PROBE_PRESSURE` / `GET_PRESSURE_TARE`
+
+You are on the **eddy-only** path but still have load cell configs or macros. Remove `[include probe_pressure.cfg]`, load cell blocks from `PRINT_START`, and reinstall Klipper extras only if needed.
 
 ### `QUERY_PROBE1` always TRIGGERED
 

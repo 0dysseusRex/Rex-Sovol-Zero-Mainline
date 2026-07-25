@@ -10,9 +10,11 @@ Sovol ships the Zero with a **custom Klipper fork** on the CB1 (single-board com
 
 1. **Replacing the host operating system** on the CB1 eMMC with Armbian Linux  
 2. **Re-flashing all microcontroller (MCU) boards** with Katapult + mainline Klipper firmware  
-3. **Replacing configuration files** so Klipper talks to the eddy probe and bed load cell using standard modules  
+3. **Replacing configuration files** so Klipper talks to the eddy probe — and, on most units, the **bed load cell** for fine Z offset  
 
-**Why?** Mainline Klipper receives security fixes, new features, and community support. The Rex config layer uses `probe_eddy_current` + `probe_pressure` — modules that work on stock hardware but require mainline Klipper (or restored Sovol Python extras).
+**Why?** Mainline Klipper receives security fixes, new features, and community support. The Rex config layer uses `probe_eddy_current` for homing and mesh on all printers, plus optional `probe_pressure` when a bed load cell is installed.
+
+> **No bed load cell?** Skip load-cell steps and follow [Eddy-Only Configuration](Eddy-Only-Configuration).
 
 ---
 
@@ -36,6 +38,7 @@ You do **not** need to be a programmer. You **do** need patience, the ability to
 | Item | Why you need it |
 |---|---|
 | **USB eMMC reader** | Remove CB1 eMMC module and flash Armbian from your PC |
+| **Know your probe hardware** | **Bed load cell present?** → default Rex path. **Eddy only?** → [Eddy-Only Configuration](Eddy-Only-Configuration) |
 | **32 GB eMMC module** (recommended) | [asnajder/zero-config](https://github.com/asnajder/zero-config) recommends 32 GB. Stock 8 GB *can* work with a special overlay ([lexfrei](https://sovol.lexfrei.dev)) — beginners should use 32 GB to avoid that extra step |
 | **Ethernet cable** (recommended for first boot) | More reliable than Wi-Fi during setup |
 | **USB keyboard + HDMI monitor** (optional) | Alternative to SSH for Armbian first login |
