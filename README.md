@@ -7,7 +7,7 @@ Working Klipper configuration and addons for the **Sovol Zero** on **mainline Kl
 - **`probe_eddy_current`** — toolhead eddy probe for Z homing, mesh, and scanning
 - **`probe_pressure`** — bed load cell (PD9 tare / PD10 trigger) for nozzle-touch Z offset
 
-This replaces Sovol stock `[z_offset_calibration]` and the broken eddy-ng hybrid that was partially configured but not active.
+This replaces Sovol stock `[z_offset_calibration]` with mainline `probe_eddy_current` + `probe_pressure`.
 
 ## Architecture
 
@@ -32,7 +32,6 @@ config/
 
 klipper/extras/
   probe_pressure.py    Sovol bed load cell module (required)
-  probe_eddy_ng.py     Optional reference — NOT used by this config (mainline eddy path)
 
 docs/
   INSTALL.md
@@ -70,6 +69,8 @@ cd Rex-Sovol-Zero-Mainline
 
 5. Restart Klipper and follow [docs/CALIBRATION.md](docs/CALIBRATION.md).
 
+See also [docs/KLIPPER_UPDATES.md](docs/KLIPPER_UPDATES.md) for keeping Klipper update-safe.
+
 ## Machine-specific values
 
 These **must be calibrated per printer** and live in the `SAVE_CONFIG` block of `printer.cfg`:
@@ -93,14 +94,13 @@ canbus_uuid: <your toolhead mcu>
 ## Tested environment
 
 - Host: BigTreeTech CB1 (aarch64)
-- Klipper: `v0.13.0-707-gf604aeee`
+- Klipper: `v0.13.0-708-g7046bd00`
 - MCUs: CAN (`mcu` + `extruder_mcu`)
 - Eddy I2C: software I2C on `extruder_mcu:PB10/PB11`
 
 ## Credits
 
 - `probe_pressure.py` — derived from Sovol OEM Klipper (GPLv3), based on upstream Klipper probe code
-- `probe_eddy_ng.py` — included for reference only ([vvuk/eddy-ng](https://github.com/vvuk/eddy-ng)); active config uses mainline `probe_eddy_current`
 
 ## License
 
