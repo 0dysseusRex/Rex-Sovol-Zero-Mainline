@@ -8,3 +8,7 @@ Thumbs.db
 # Local secrets (never commit)
 .env
 *.secret
+
+# Local wiki publish scratch dirs
+wiki-tmp/
+wiki-test-clone/

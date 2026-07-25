@@ -23,3 +23,11 @@ jobs:
           path: docs/wiki
           strategy: init
           commit-message: Sync wiki from docs/wiki
+          ignore: README.md
+
+      - name: Wiki not initialized hint
+        if: failure()
+        run: |
+          echo "::warning::If this failed with 'Repository not found', create the first wiki page once:"
+          echo "https://github.com/${{ github.repository }}/wiki/_new"
+          echo "Then re-run this workflow from the Actions tab."
