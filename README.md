@@ -1,6 +1,8 @@
 # Rex-Sovol-Zero-Mainline
 
-If your **Sovol Zero** is already on mainline Klipper, this repo provides the config and Python modules to use the stock probing hardware properly. The toolhead eddy probe handles Z homing and bed mesh; the bed load cell fine-tunes nozzle height with a nozzle touch; axis twist compensation calibrates both so your first layer stays consistent across the bed.
+**New to mainline Klipper?** See the full migration wiki: **[OEM → Mainline Klipper on the Sovol Zero](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline/wiki)** — step-by-step guide for SSH, ST-LINK, Armbian, MCU flashing, and calibration (with recovery links to [asnajder/zero-config](https://github.com/asnajder/zero-config/tree/main/recovery)).
+
+If your **Sovol Zero** is already on mainline Klipper, this repo provides the config and Python modules to use the stock probing hardware properly.
 
 ## Support
 

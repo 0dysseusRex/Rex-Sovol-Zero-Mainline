@@ -9,6 +9,8 @@
 
 ## Important: merge templates, do not overwrite
 
+> **Full OEM → mainline migration:** [GitHub Wiki — Sovol Zero Mainline Migration](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline/wiki)
+
 `config/printer.cfg` and `config/Macro.cfg` in this repo are **merge templates**, not complete configs. They contain only what is specific to eddy + load cell probing. You must **merge** them into your existing files — do not replace your whole `printer.cfg` or you will lose machine-specific settings (UUIDs, PID, input shaper, display, etc.).
 
 ## 1. Install Klipper extras

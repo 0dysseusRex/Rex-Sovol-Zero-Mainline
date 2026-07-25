@@ -1,0 +1,189 @@
+# Configuration and Rex Repo
+
+Once Klipper connects to MCUs, you need **configuration files** telling it about the Zero's hardware. This page covers the baseline from [asnajder/zero-config](https://github.com/asnajder/zero-config) plus the **[Rex-Sovol-Zero-Mainline](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline)** layer for eddy + bed load cell.
+
+---
+
+## Two config layers
+
+| Layer | Repo | When |
+|---|---|---|
+| **Base mainline Zero** | [asnajder/zero-config](https://github.com/asnajder/zero-config) configs | First Klipper start after MCU flash |
+| **Eddy + load cell tuning** | [Rex-Sovol-Zero-Mainline](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline) | After base Klipper runs |
+
+**Do not overwrite** your entire `printer.cfg` with any single repo — merge sections and keep your `SAVE_CONFIG` block.
+
+---
+
+## Architecture (why Rex config exists)
+
+```
+G28 X Y  →  G28 Z (eddy, non-contact)  →  PRINT_START  →  load cell touch  →  G28 Z  →  mesh
+```
+
+| Function | Module | Hardware |
+|---|---|---|
+| Z homing + mesh | `probe_eddy_current` | Toolhead LDC1612 eddy |
+| Fine first-layer Z | `probe_pressure` | Bed strain gauge (PD9/PD10) |
+| Axis twist cal | `axis_twist_pressure` | Eddy at offset + load cell touch |
+
+**G28 never uses the load cell** — same pattern as Cartographer-style scan homing.
+
+Details: [Rex README](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline#architecture)
+
+---
+
+## Install Rex Klipper extras
+
+SSH into printer:
+
+```bash
+cd ~
+git clone https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline.git
+cd Rex-Sovol-Zero-Mainline
+./scripts/install-probe-pressure.sh ~/klipper
+```
+
+**Why Python extras?** Mainline Klipper doesn't include Sovol's bed load cell module. This script copies `probe_pressure.py` and `axis_twist_pressure.py` into `~/klipper/klippy/extras/`.
+
+Klipper may show **"dirty"** version — normal with untracked extras ([KLIPPER_UPDATES.md](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline/blob/master/docs/KLIPPER_UPDATES.md)).
+
+---
+
+## Copy config snippets
+
+```bash
+cp ~/Rex-Sovol-Zero-Mainline/config/sovol_eddy.cfg ~/printer_data/config/
+cp ~/Rex-Sovol-Zero-Mainline/config/probe_pressure.cfg ~/printer_data/config/
+cp ~/Rex-Sovol-Zero-Mainline/config/GP3D_Macro.cfg ~/printer_data/config/
+cp ~/Rex-Sovol-Zero-Mainline/config/Rex_Macros.cfg ~/printer_data/config/
+cp ~/Rex-Sovol-Zero-Mainline/config/display_macros.cfg ~/printer_data/config/
+```
+
+Optional:
+```bash
+cp ~/Rex-Sovol-Zero-Mainline/config/line_purge.cfg ~/printer_data/config/
+```
+
+---
+
+## Includes in printer.cfg
+
+Add near top of `~/printer_data/config/printer.cfg` (order matters):
+
+```ini
+[include mainsail.cfg]
+[include Macro.cfg]
+[include GP3D_Macro.cfg]
+[include Rex_Macros.cfg]
+[include display_macros.cfg]
+[include sovol_eddy.cfg]
+[include probe_pressure.cfg]
+# [include line_purge.cfg]    ; optional
+```
+
+**Why order?** Later files override earlier macros; display menus extend GP3D menus.
+
+---
+
+## Critical printer.cfg changes
+
+Merge from [Rex printer.cfg template](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline/blob/master/config/printer.cfg):
+
+| Setting | Value | Why |
+|---|---|---|
+| `[stepper_z] endstop_pin` | `probe:z_virtual_endstop` | Z homes on eddy, not load cell |
+| `[safe_z_home]` | See template | Safe XY before Z homing |
+| `[force_move] enable_force_move` | `True` | Required for `EDDY_CALIBRATE_PREP` |
+| **Remove** | `[z_offset_calibration]` | Sovol fork only |
+| **Remove** | `[probe_eddy_ng]`, eddyng includes | Not used on mainline path |
+| **Update** | All `canbus_uuid` | Your flashed UUIDs |
+
+Verify:
+```ini
+[stepper_z]
+endstop_pin: probe:z_virtual_endstop
+```
+
+**Do NOT set** `endstop_pin: probe_pressure:z_virtual_endstop`.
+
+---
+
+## Merge macros (Macro.cfg)
+
+From [Rex Macro.cfg template](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline/blob/master/config/Macro.cfg):
+
+| Macro | Purpose |
+|---|---|
+| `G28` | Safe Z homing until eddy calibrated |
+| `PRINT_START` / `START_PRINT` | Bed heat → nozzle clean → load cell Z → mesh |
+| `CLEAN_NOZZLE` | Brush + silicone wipe before probing |
+| `END_PRINT` | Park, cooldown |
+
+If migrating from stock Sovol `Macro.cfg`, **merge** — don't duplicate `PAUSE`/`RESUME`/`CANCEL_PRINT` unless you intend to override [mainsail.cfg](https://github.com/mainsail-crew/mainsail-config) versions.
+
+---
+
+## Display menus (UC1701 knob screen)
+
+`display_macros.cfg` adds:
+
+**Prepare → Calibration:** Clean Nozzle, Load Cell Z Touch, Eddy Cal Prep, Axis Twist Cal, Chamber Preheat  
+**Tune:** Save Z Offset, End Print + Save Z  
+**Setup → Lights:** On / Off / Breathe  
+
+Requires stock `[display]` section in `printer.cfg` (UC1701).
+
+**Display knob reversed?** Swap encoder pins per [zero-config finishing notes](https://github.com/asnajder/zero-config#finishing-up):
+```ini
+encoder_pins: ^EXP2_3, ^EXP2_5
+```
+
+**KlipperScreen alternative:** [lexfrei sovol_codes plugin](https://github.com/lexfrei/sovol-zero-mainline/tree/main/klipper-plugin) reproduces vendor numeric codes on HDMI — optional.
+
+---
+
+## Slicer G-code
+
+Replace long OEM start sequence in Orca:
+
+**Start G-code** ([template](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline/blob/master/slicer/Sovol-OrcaSlicer-start.gcode)):
+```gcode
+M117
+START_PRINT BED=[bed_temperature_initial_layer_single] HOTEND=[nozzle_temperature_initial_layer] CHAMBER=[chamber_temperature]
+SET_PRINT_STATS_INFO TOTAL_LAYER=[total_layer_count]
+G90
+```
+
+**End G-code:**
+```gcode
+END_PRINT
+```
+
+**Why short g-code?** `PRINT_START` macro handles homing, heating, probing, mesh — duplicating in slicer causes double-homing and wrong probe order.
+
+---
+
+## Start from zero-config baseline (alternative)
+
+If you don't have a working merged config yet, start from [asnajder/zero-config configs](https://github.com/asnajder/zero-config) and add Rex includes on top. Remove unsupported Sovol fork sections iteratively until Klipper starts — see zero-config "Finishing Up".
+
+---
+
+## Restart and verify
+
+```bash
+sudo systemctl restart klipper
+```
+
+Mainsail → Machine tab → verify objects exist:
+- `probe_eddy_current eddy`
+- `probe_pressure`
+- `gcode_macro BED_LOADCELL_Z_OFFSET`
+- `gcode_macro EDDY_CALIBRATE_PREP`
+
+---
+
+## Next step
+
+→ **[Calibration](Calibration)** — mandatory before first print
