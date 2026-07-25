@@ -13,5 +13,10 @@ fi
 
 cp "$SRC" "$DEST"
 echo "Installed probe_pressure.py -> $DEST"
+
+ATC_SRC="$(cd "$(dirname "$0")/.." && pwd)/klipper/extras/axis_twist_pressure.py"
+ATC_DEST="$KLIPPER_DIR/klippy/extras/axis_twist_pressure.py"
+cp "$ATC_SRC" "$ATC_DEST"
+echo "Installed axis_twist_pressure.py -> $ATC_DEST"
 echo "Add to printer.cfg: [include probe_pressure.cfg]"
 echo "Restart Klipper after copying config files."
