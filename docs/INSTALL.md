@@ -65,14 +65,30 @@ Required changes from this repo's `config/Macro.cfg`:
 | `PRINT_START` | `SET_GCODE_OFFSET Z=0` → `BED_LOADCELL_Z_OFFSET` → `G28 Z` → `LINE_PURGE` |
 | `END_PRINT` | Remove `PROBE_EDDY_NG_SET_TAP_OFFSET` |
 
-## Line purge (SimpleAF-style KAMP)
+## Slicer start / end g-code
 
-Add to your slicer start gcode **before** `PRINT_START` so Moonraker injects object bounds:
+Copy from `slicer/Sovol-OrcaSlicer-start.gcode` and `slicer/Sovol-OrcaSlicer-end.gcode`, or paste:
+
+**Start g-code** (replaces the long OEM heat/home/purge block):
 
 ```gcode
 M117
-PRINT_START BED=[first_layer_bed_temperature] HOTEND=[first_layer_temperature]
+START_PRINT BED=[bed_temperature_initial_layer_single] HOTEND=[nozzle_temperature_initial_layer] CHAMBER=[chamber_temperature]
+SET_PRINT_STATS_INFO TOTAL_LAYER=[total_layer_count]
+G90
 ```
+
+`START_PRINT` is an alias for `PRINT_START`. The macro handles homing, bed/chamber heat, load-cell Z offset, eddy mesh, skew profile, and adaptive `LINE_PURGE`. Do not duplicate M140/M190, G28, M104/M109, or manual purge lines here.
+
+Enable **Exclude Objects** in the slicer so Moonraker injects object bounds for adaptive purge placement. If your slicer profile has no chamber variable, use `CHAMBER=0`.
+
+**End g-code:**
+
+```gcode
+END_PRINT
+```
+
+## Line purge (SimpleAF-style KAMP)
 
 Tune at runtime: `SETUP_LINE_PURGE PURGE_AMOUNT=40 FLOW_RATE=12`  
 Skip once: `LINE_PURGE PURGE=0`
