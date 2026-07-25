@@ -58,6 +58,7 @@ config/
   sovol_eddy.cfg       Eddy probe, bed mesh, eddy helper macros
   probe_pressure.cfg   Load cell probe, axis twist, BED_LOADCELL_Z_OFFSET macro
   crowsnest.conf       MGS1 USB chamber camera (crowsnest / ustreamer)
+  moonraker-webcam.cfg Mainsail webcam service settings (use mjpegstreamer, not adaptive)
   Macro.cfg            Print lifecycle macros (PRINT_START, G28, etc.)
 
 klipper/extras/
