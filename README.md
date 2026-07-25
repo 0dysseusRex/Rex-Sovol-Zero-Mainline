@@ -1,4 +1,6 @@
-# Sovol Zero — Mainline Klipper (Eddy + Bed Load Cell)
+# Rex-Sovol-Zero-Mainline
+
+Sovol Zero on **mainline Klipper** — eddy probe Z homing + bed load cell Z offset.
 
 Working Klipper configuration and addons for the **Sovol Zero** on **mainline Klipper** (~v0.13.0), using:
 
