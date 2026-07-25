@@ -63,6 +63,26 @@ BED_LOADCELL_Z_OFFSET
 G28 Z
 ```
 
+`BED_LOADCELL_Z_OFFSET` defaults to **X25 Y20** (bed load cell location). Override with `X=` / `Y=` if needed.
+
+## Axis twist compensation
+
+The load cell is under **~X25 Y20**. Nozzle touches during calibration must stay near that point — points at bed center or far edges will not trigger reliably and can crash into the bed.
+
+```
+G28
+AXIS_TWIST_COMPENSATION_CALIBRATE          ; X sweep 12–50 at Y=20
+SAVE_CONFIG
+
+G28
+AXIS_TWIST_COMPENSATION_CALIBRATE AXIS=Y   ; Y sweep 12–48 at X=25
+SAVE_CONFIG
+```
+
+Eddy probe steps still run at probe offsets along each sweep. Twist compensation extrapolates outside the calibrated range for mesh and print moves.
+
+If a touch point still pushes too hard, shrink `calibrate_end_x` / `calibrate_end_y` in `probe_pressure.cfg` further toward the sensor.
+
 ## Load cell sanity check
 
 ```
@@ -83,6 +103,7 @@ If **`TRIGGERED`** at rest: check wiring, re-tare, ensure bed is unloaded.
 | SAVE_CONFIG reg_drive_current conflict | Hardcoded in included cfg | Comment out in `sovol_eddy.cfg` |
 | G28 Z reboots | Uncalibrated eddy or bad cal data | Re-run PROBE_EDDY_CURRENT_CALIBRATE |
 | QUERY_PROBE1 always TRIGGERED | Load cell stuck / bed loaded | Re-tare, check PD10 wiring |
+| Axis twist cal crashes at last point | Nozzle too far from load cell (~X25 Y20) | Shrink cal range in `probe_pressure.cfg`; keep cross-axis at Y=20 or X=25 |
 
 ## G28 macro (mainline-safe)
 

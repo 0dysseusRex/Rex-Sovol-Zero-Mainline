@@ -44,7 +44,9 @@ AXIS_TWIST_COMPENSATION_CALIBRATE AXIS=Y   ; Y axis
 SAVE_CONFIG
 ```
 
-Cal sweep ranges are in `probe_pressure.cfg` (default 20–132 mm at bed center).
+Cal sweep ranges are in `probe_pressure.cfg`. They are **limited to the bed load cell location (~X25 Y20)** — nozzle touches must stay near the sensor. Eddy probe steps still run at the full probe-offset positions along each sweep; twist values extrapolate outside the cal range during mesh and print.
+
+Default sweeps: X 12–50 mm at Y=20; Y 12–48 mm at X=25.
 
 ## Repository layout
 
