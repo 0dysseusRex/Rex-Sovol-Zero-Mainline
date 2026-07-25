@@ -114,10 +114,48 @@ cd Rex-Sovol-Zero-Mainline
 
 See also [docs/KLIPPER_UPDATES.md](docs/KLIPPER_UPDATES.md) for keeping Klipper update-safe.
 
-<details>
-<summary><strong>Extras — line purge &amp; slicer start g-code</strong></summary>
+## Klipper shows "dirty" — that's OK
+
+After installing `probe_pressure.py` and `axis_twist_pressure.py`, Moonraker and Klipper may report the repo as **dirty** (e.g. `v0.13.0-708-g7046bd00-dirty`) because those files are **untracked** in the upstream Klipper tree.
+
+This is **normal and expected**. It does **not** block `git pull` or cause update problems, as long as you have **no modified tracked files** (don't patch `bed_mesh.py`, `src/Makefile`, etc.).
+
+Untracked extras = fine. Modified upstream files = update headaches.
+
+## Machine-specific values
+
+These **must be calibrated per printer** and live in the `SAVE_CONFIG` block of `printer.cfg`:
+
+- `[probe_eddy_current eddy]` → `reg_drive_current`, `calibrate`
+- `[axis_twist_compensation]` → `z_compensations`, `zy_compensations` (after axis twist cal)
+- `[bed_mesh]` mesh points
+- `[input_shaper]`, PID, skew, etc.
+
+**Do not copy another machine's `SAVE_CONFIG` block verbatim.**
+
+Also update CAN UUIDs in `printer.cfg` for your MCUs:
+
+```ini
+[mcu]
+canbus_uuid: <your main mcu>
+
+[mcu extruder_mcu]
+canbus_uuid: <your toolhead mcu>
+```
+
+## Tested environment
+
+- Host: BigTreeTech CB1 (aarch64)
+- Klipper: `v0.13.0-708-g7046bd00`
+- MCUs: CAN (`mcu` + `extruder_mcu`)
+- Eddy I2C: software I2C on `extruder_mcu:PB10/PB11`
+
+## Extras
 
 Optional quality-of-life additions included in this repo. Not required for eddy + load cell probing.
+
+<details>
+<summary>Line purge &amp; slicer start g-code</summary>
 
 ### Line purge
 
@@ -160,42 +198,6 @@ END_PRINT
 If your slicer profile has no chamber variable, use `CHAMBER=0`.
 
 </details>
-
-## Klipper shows "dirty" — that's OK
-
-After installing `probe_pressure.py` and `axis_twist_pressure.py`, Moonraker and Klipper may report the repo as **dirty** (e.g. `v0.13.0-708-g7046bd00-dirty`) because those files are **untracked** in the upstream Klipper tree.
-
-This is **normal and expected**. It does **not** block `git pull` or cause update problems, as long as you have **no modified tracked files** (don't patch `bed_mesh.py`, `src/Makefile`, etc.).
-
-Untracked extras = fine. Modified upstream files = update headaches.
-
-## Machine-specific values
-
-These **must be calibrated per printer** and live in the `SAVE_CONFIG` block of `printer.cfg`:
-
-- `[probe_eddy_current eddy]` → `reg_drive_current`, `calibrate`
-- `[axis_twist_compensation]` → `z_compensations`, `zy_compensations` (after axis twist cal)
-- `[bed_mesh]` mesh points
-- `[input_shaper]`, PID, skew, etc.
-
-**Do not copy another machine's `SAVE_CONFIG` block verbatim.**
-
-Also update CAN UUIDs in `printer.cfg` for your MCUs:
-
-```ini
-[mcu]
-canbus_uuid: <your main mcu>
-
-[mcu extruder_mcu]
-canbus_uuid: <your toolhead mcu>
-```
-
-## Tested environment
-
-- Host: BigTreeTech CB1 (aarch64)
-- Klipper: `v0.13.0-708-g7046bd00`
-- MCUs: CAN (`mcu` + `extruder_mcu`)
-- Eddy I2C: software I2C on `extruder_mcu:PB10/PB11`
 
 ## Credits
 
