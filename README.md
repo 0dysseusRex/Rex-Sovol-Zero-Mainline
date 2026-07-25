@@ -57,6 +57,7 @@ config/
   printer.cfg          Full printer config (includes other macro files on the live machine)
   sovol_eddy.cfg       Eddy probe, bed mesh, eddy helper macros
   probe_pressure.cfg   Load cell probe, axis twist, BED_LOADCELL_Z_OFFSET macro
+  crowsnest.conf       MGS1 USB chamber camera (crowsnest / ustreamer)
   Macro.cfg            Print lifecycle macros (PRINT_START, G28, etc.)
 
 klipper/extras/
