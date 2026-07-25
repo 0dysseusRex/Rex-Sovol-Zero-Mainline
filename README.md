@@ -71,6 +71,14 @@ cd Rex-Sovol-Zero-Mainline
 
 See also [docs/KLIPPER_UPDATES.md](docs/KLIPPER_UPDATES.md) for keeping Klipper update-safe.
 
+## Klipper shows "dirty" — that's OK
+
+After installing `probe_pressure.py`, Moonraker and Klipper may report the repo as **dirty** (e.g. `v0.13.0-708-g7046bd00-dirty`) because `klippy/extras/probe_pressure.py` is an **untracked** file in the upstream Klipper tree.
+
+This is **normal and expected**. It does **not** block `git pull` or cause update problems, as long as you have **no modified tracked files** (don't patch `bed_mesh.py`, `src/Makefile`, etc.).
+
+Untracked extras = fine. Modified upstream files = update headaches.
+
 ## Machine-specific values
 
 These **must be calibrated per printer** and live in the `SAVE_CONFIG` block of `printer.cfg`:
@@ -101,6 +109,12 @@ canbus_uuid: <your toolhead mcu>
 ## Credits
 
 - `probe_pressure.py` — derived from Sovol OEM Klipper (GPLv3), based on upstream Klipper probe code
+
+## Support
+
+If this config helped you, consider buying me a coffee:
+
+**[ko-fi.com/0dysseusrex](https://ko-fi.com/0dysseusrex)**
 
 ## License
 
