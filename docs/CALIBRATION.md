@@ -47,6 +47,32 @@ SAVE_CONFIG
 G28
 ```
 
+```
+G28 X Y  →  G28 Z (eddy)  →  RUN_PROBE_PRESSURE (load cell, PRINT_START only)  →  SET_GCODE_OFFSET  →  G28 Z
+```
+
+## Homing vs load cell touch
+
+Your printer should already match the Cartographer / SimpleAF split:
+
+| Action | Sensor | When |
+|---|---|---|
+| `G28` / `G28 Z` | Eddy (`probe:z_virtual_endstop`) | Anytime — **no nozzle touch** |
+| `BED_LOADCELL_Z_OFFSET` | Load cell nozzle touch | `PRINT_START` only (after wipe + 150°C) |
+| `EDDY_CALIBRATE_PREP` | Load cell | First-time eddy calibration bootstrap |
+| Axis twist cal | Eddy + load cell | Calibration |
+
+Verify in **your** `printer.cfg`:
+
+```ini
+[stepper_z]
+endstop_pin: probe:z_virtual_endstop
+```
+
+Do **not** set `endstop_pin` to `probe_pressure:z_virtual_endstop`. The load cell is a fine Z0 reference, not a homing endstop.
+
+If the nozzle still hits the bed during `G28 Z`, the eddy is triggering too late (recalibrate eddy) or there is a large filament blob — `CLEAN_NOZZLE` + 150°C before load cell touch addresses the latter.
+
 ## Load cell Z offset (every print / as needed)
 
 ```

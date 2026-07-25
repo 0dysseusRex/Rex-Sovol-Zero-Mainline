@@ -20,16 +20,22 @@ This replaces Sovol stock `[z_offset_calibration]` with mainline `probe_eddy_cur
 
 ## Architecture
 
+```
+G28 X Y  →  G28 Z (eddy, non-contact)  →  … print start …  →  load cell touch  →  G28 Z  →  mesh
+```
+
+**G28 never uses the load cell.** With `[stepper_z] endstop_pin: probe:z_virtual_endstop`, all `G28 Z` moves stop on the eddy probe (same idea as Cartographer scan homing). The nozzle only touches the bed during:
+
+- `BED_LOADCELL_Z_OFFSET` in `PRINT_START` (fine Z0 at 150°C after nozzle wipe)
+- `EDDY_CALIBRATE_PREP` (first-time eddy bootstrap)
+- `AXIS_TWIST_COMPENSATION_CALIBRATE` (calibration)
+
 | Role | Hardware | Klipper module |
 |---|---|---|
 | Coarse Z homing | LDC1612 eddy on toolhead | `[probe_eddy_current eddy]` → `stepper_z` virtual endstop |
 | Fine Z offset | Bed strain gauge via external HX711 board | `[probe_pressure]` on PD10, tare on PD9 |
 | Mesh / scan | Eddy probe | `BED_MESH_CALIBRATE`, `PROBE METHOD=scan` |
 | Axis twist compensation | Eddy at probe offset + load cell nozzle touch | `[axis_twist_compensation]` + `[axis_twist_pressure]` |
-
-```
-G28 X Y  →  G28 Z (eddy)  →  RUN_PROBE_PRESSURE (load cell)  →  SET_GCODE_OFFSET  →  G28 Z
-```
 
 ### Axis twist compensation
 
