@@ -2,11 +2,16 @@
 
 ## Prerequisites
 
-- Sovol Zero on **mainline Klipper** (not Sovol fork)
+- Sovol Zero **already running mainline Klipper** (not the Sovol firmware fork)
+- Your own working `printer.cfg` with steppers, heaters, MCUs, and Moonraker
 - CAN MCUs configured and communicating
-- `[force_move]` with `enable_force_move: True` (needed for `SET_KINEMATIC_POSITION` during first eddy cal)
+- `[force_move]` with `enable_force_move: True` (needed for `EDDY_CALIBRATE_PREP`)
 
-## 1. Install probe_pressure.py
+## Important: merge templates, do not overwrite
+
+`config/printer.cfg` and `config/Macro.cfg` in this repo are **merge templates**, not complete configs. They contain only what is specific to eddy + load cell probing. You must **merge** them into your existing files — do not replace your whole `printer.cfg` or you will lose machine-specific settings (UUIDs, PID, input shaper, display, etc.).
+
+## 1. Install Klipper extras
 
 ```bash
 git clone https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline.git
@@ -14,71 +19,56 @@ cd Rex-Sovol-Zero-Mainline
 ./scripts/install-probe-pressure.sh ~/klipper
 ```
 
-Or manually:
+This copies `probe_pressure.py` and `axis_twist_pressure.py` into your Klipper tree.
+
+## 2. Deploy included config snippets
 
 ```bash
-cp klipper/extras/probe_pressure.py ~/klipper/klippy/extras/
+cp config/sovol_eddy.cfg config/probe_pressure.cfg ~/printer_data/config/
 ```
 
-## 2. Deploy config files
+## 3. Merge `printer.cfg`
 
-```bash
-cp config/sovol_eddy.cfg ~/printer_data/config/
-cp config/probe_pressure.cfg ~/printer_data/config/
-```
+Open **your** `~/printer_data/config/printer.cfg` and use `config/printer.cfg` from this repo as a checklist:
 
-## 3. Update printer.cfg
-
-Add includes (after your other macro includes):
-
-```ini
-[include sovol_eddy.cfg]
-[include probe_pressure.cfg]
-```
-
-Confirm Z homing uses the eddy virtual endstop:
-
-```ini
-[stepper_z]
-endstop_pin: probe:z_virtual_endstop
-```
-
-Add safe Z home (if not present):
-
-```ini
-[safe_z_home]
-home_xy_position: 76.2,76.2
-speed: 90.0
-z_hop: 5
-z_hop_speed: 10.0
-```
-
-**Do not** hardcode `reg_drive_current` in `sovol_eddy.cfg` — let `SAVE_CONFIG` manage it after `LDC_CALIBRATE_DRIVE_CURRENT`.
-
-## 4. Update macros (Macro.cfg)
-
-Required changes from this repo's `config/Macro.cfg`:
-
-| Macro | Change |
+| Action | What |
 |---|---|
-| `G28` | Check `'calibrate' in eddy config` (not `printer.probe.is_calibrated` — mainline lacks that) |
-| `PRINT_START` | `SET_GCODE_OFFSET Z=0` → `BED_LOADCELL_Z_OFFSET` → `G28 Z` → `LINE_PURGE` |
-| `END_PRINT` | Remove `PROBE_EDDY_NG_SET_TAP_OFFSET` |
+| Add includes | `[include sovol_eddy.cfg]`, `[include probe_pressure.cfg]` |
+| Update `[stepper_z]` | `endstop_pin: probe:z_virtual_endstop` |
+| Add `[safe_z_home]` | If missing — see template for coordinates |
+| Add `[force_move]` | `enable_force_move: True` if missing |
+| Remove | `[z_offset_calibration]`, Sovol fork eddy modules |
+| Keep yours | CAN UUIDs, steppers, heaters, fans, `SAVE_CONFIG` block |
 
-Optional **line purge** and **slicer start g-code** are documented in the README **Extras** section.
+## 4. Merge `Macro.cfg`
 
-## 5. Restart
+Merge from `config/Macro.cfg` into **your** macro file (or `[include Macro.cfg]` after resolving conflicts):
+
+| Macro | Purpose |
+|---|---|
+| `G28` | Block Z home until eddy `calibrate` exists in SAVE_CONFIG |
+| `PRINT_START` | Bed heat → load cell Z offset → eddy mesh |
+| `START_PRINT` | Slicer alias for `PRINT_START` |
+| `END_PRINT` | Minimal end routine — customize park/cooldown |
+
+Remove Sovol-fork references such as `PROBE_EDDY_NG_SET_TAP_OFFSET` from your end macro if present.
+
+Optional **line purge** and **slicer start g-code**: see README **Extras**.
+
+## 5. Restart and calibrate
 
 ```bash
 sudo systemctl restart klipper
 ```
 
-Verify objects exist in Moonraker:
+Verify in Moonraker / Mainsail:
 
 - `probe_eddy_current eddy`
 - `probe_pressure`
 - `gcode_macro BED_LOADCELL_Z_OFFSET`
 - `gcode_macro EDDY_CALIBRATE_PREP`
+
+Follow [docs/CALIBRATION.md](docs/CALIBRATION.md) for first-time eddy and axis twist calibration.
 
 ## What NOT to install
 
@@ -86,8 +76,8 @@ Verify objects exist in Moonraker:
 |---|---|
 | `[load_cell]` upstream module | Wrong API — PD10 is digital trigger, not HX711 |
 | `[z_offset_calibration]` | Requires Sovol fork eddy probe methods |
-| `eddyng.cfg` / `[probe_eddy_ng]` | Not used — mainline `probe_eddy_current` path chosen |
+| `eddyng.cfg` / `[probe_eddy_ng]` | Not used — mainline `probe_eddy_current` path |
 
 ## probe_pressure.py patch
 
-This repo includes a small fix: `RUN_PROBE_PRESSURE` stores `last_z_result` (required by `BED_LOADCELL_Z_OFFSET`). Stock Sovol v1.3.7 omitted this.
+This repo includes a fix: `RUN_PROBE_PRESSURE` stores `last_z_result` (required by `BED_LOADCELL_Z_OFFSET`). Stock Sovol v1.3.7 omitted this.

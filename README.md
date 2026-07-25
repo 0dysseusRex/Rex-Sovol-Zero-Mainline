@@ -62,11 +62,11 @@ Default sweeps: X 12–50 mm at Y=20; Y 12–48 mm at X=25.
 
 ```
 config/
-  printer.cfg          Full printer config (includes other macro files on the live machine)
+  printer.cfg          Merge template — NOT a full config (see below)
+  Macro.cfg            Merge template — G28, PRINT_START, END_PRINT only
   sovol_eddy.cfg       Eddy probe, bed mesh, eddy helper macros
-  probe_pressure.cfg   Load cell probe, axis twist, BED_LOADCELL_Z_OFFSET macro
-  line_purge.cfg       Adaptive line purge (optional; see Extras below)
-  Macro.cfg            Print lifecycle macros (PRINT_START, G28, etc.)
+  probe_pressure.cfg   Load cell probe, axis twist, BED_LOADCELL_Z_OFFSET
+  line_purge.cfg       Adaptive line purge (optional; see Extras)
 
 klipper/extras/
   probe_pressure.py         Sovol bed load cell module (required)
@@ -84,6 +84,16 @@ scripts/
   install-probe-pressure.sh
 ```
 
+## Config files you must merge yourself
+
+`config/printer.cfg` and `config/Macro.cfg` are **not** complete drop-in configs. They are annotated templates showing only the eddy + load cell changes. Merge them into your existing mainline setup:
+
+- **Keep** your CAN UUIDs, stepper/heater/fan sections, display, Moonraker includes, and `SAVE_CONFIG` block
+- **Add** the includes and Z-homing changes from `printer.cfg`
+- **Merge** the macros from `Macro.cfg` (or include the file and resolve duplicates)
+
+See [docs/INSTALL.md](docs/INSTALL.md) for step-by-step merge instructions.
+
 ## Quick install
 
 ```bash
@@ -96,19 +106,14 @@ cd Rex-Sovol-Zero-Mainline
    ./scripts/install-probe-pressure.sh ~/klipper
    ```
 
-2. Copy config snippets into `~/printer_data/config/`:
+2. Copy the **required** config snippets into `~/printer_data/config/`:
    ```bash
    cp config/sovol_eddy.cfg config/probe_pressure.cfg ~/printer_data/config/
    ```
 
-3. Merge into `printer.cfg`:
-   ```ini
-   [include sovol_eddy.cfg]
-   [include probe_pressure.cfg]
-   ```
-   Ensure `[stepper_z]` uses `endstop_pin: probe:z_virtual_endstop`.
+3. **Merge** `config/printer.cfg` into your existing `printer.cfg` (includes, `[stepper_z]` endstop, `[safe_z_home]`, `[force_move]`). Do not overwrite your whole file.
 
-4. Merge relevant macros from `config/Macro.cfg` (at minimum: `G28`, `PRINT_START`, `END_PRINT`).
+4. **Merge** `config/Macro.cfg` into your macros (`G28`, `PRINT_START`, `END_PRINT` at minimum).
 
 5. Restart Klipper and follow [docs/CALIBRATION.md](docs/CALIBRATION.md).
 
@@ -165,7 +170,7 @@ Adaptive first-layer purge inspired by [pellcorp/creality](https://github.com/pe
    ```ini
    [include line_purge.cfg]
    ```
-2. `PRINT_START` in `Macro.cfg` already calls `LINE_PURGE` after mesh + skew.
+2. Uncomment `LINE_PURGE` in your merged `PRINT_START` macro.
 3. Enable **Exclude Objects** in Orca Slicer so Moonraker injects object bounds.
 
 Runtime tuning:
