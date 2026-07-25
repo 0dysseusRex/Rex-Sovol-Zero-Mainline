@@ -65,6 +65,25 @@ G28 Z
 
 `BED_LOADCELL_Z_OFFSET` defaults to **X25 Y20** (bed load cell location). Override with `X=` / `Y=` if needed.
 
+## Load cell Z offset tuning
+
+The load cell finds **contact**; your preferred **first-layer squish** is set separately via `[probe_pressure] z_offset` in `probe_pressure.cfg`. That value is added in `BED_LOADCELL_Z_OFFSET` when applying `SET_GCODE_OFFSET`.
+
+1. Run a test print.
+2. If the first layer is too close or too far, note the baby-step correction (e.g. **+0.240** mm = nozzle too close, raise offset).
+3. Set `z_offset` to that value and restart Klipper (or `FIRMWARE_RESTART`).
+
+Check repeatability before chasing larger code changes:
+
+```
+G28 X Y
+G0 X25 Y20 F6000
+G28 Z
+RUN_PROBE_PRESSURE
+```
+
+Run several times — spread should stay within ~0.02–0.05 mm. If not, check tare (`GET_PRESSURE_TARE`), probe speed, and bed isolation. With stable repeats, `z_offset` is the right knob; `PROBE_CALIBRATE1` is optional for fine-tuning the same value into `SAVE_CONFIG`.
+
 ## Axis twist compensation
 
 The load cell is under **~X25 Y20**. Nozzle touches during calibration must stay near that point — points at bed center or far edges will not trigger reliably and can crash into the bed.
