@@ -2,6 +2,14 @@
 
 Sovol Zero on **mainline Klipper** — eddy probe Z homing + bed load cell Z offset.
 
+## Support
+
+If this config helped you, consider buying me a coffee:
+
+**[ko-fi.com/0dysseusrex](https://ko-fi.com/0dysseusrex)**
+
+---
+
 Working Klipper configuration and addons for the **Sovol Zero** on **mainline Klipper** (~v0.13.0), using:
 
 - **`probe_eddy_current`** — toolhead eddy probe for Z homing, mesh, and scanning
@@ -57,14 +65,16 @@ config/
   printer.cfg          Full printer config (includes other macro files on the live machine)
   sovol_eddy.cfg       Eddy probe, bed mesh, eddy helper macros
   probe_pressure.cfg   Load cell probe, axis twist, BED_LOADCELL_Z_OFFSET macro
-  crowsnest.conf       MGS1 USB chamber camera (crowsnest / ustreamer)
-  moonraker-webcam.cfg Mainsail webcam service settings (use mjpegstreamer, not adaptive)
-  line_purge.cfg       Adaptive line purge (SimpleAF-style KAMP)
+  line_purge.cfg       Adaptive line purge (optional; see Extras below)
   Macro.cfg            Print lifecycle macros (PRINT_START, G28, etc.)
 
 klipper/extras/
   probe_pressure.py         Sovol bed load cell module (required)
   axis_twist_pressure.py    Load cell nozzle touch for axis twist cal (required)
+
+slicer/
+  Sovol-OrcaSlicer-start.gcode
+  Sovol-OrcaSlicer-end.gcode
 
 docs/
   INSTALL.md
@@ -103,6 +113,53 @@ cd Rex-Sovol-Zero-Mainline
 5. Restart Klipper and follow [docs/CALIBRATION.md](docs/CALIBRATION.md).
 
 See also [docs/KLIPPER_UPDATES.md](docs/KLIPPER_UPDATES.md) for keeping Klipper update-safe.
+
+<details>
+<summary><strong>Extras — line purge &amp; slicer start g-code</strong></summary>
+
+Optional quality-of-life additions included in this repo. Not required for eddy + load cell probing.
+
+### Line purge
+
+Adaptive first-layer purge inspired by [pellcorp/creality](https://github.com/pellcorp/creality) (SimpleAF) and KAMP. Places a purge line near the print when the slicer emits `EXCLUDE_OBJECT` bounds.
+
+1. Add to `printer.cfg`:
+   ```ini
+   [include line_purge.cfg]
+   ```
+2. `PRINT_START` in `Macro.cfg` already calls `LINE_PURGE` after mesh + skew.
+3. Enable **Exclude Objects** in Orca Slicer so Moonraker injects object bounds.
+
+Runtime tuning:
+```gcode
+SETUP_LINE_PURGE PURGE_AMOUNT=40 FLOW_RATE=12 PURGE_MARGIN=25
+LINE_PURGE PURGE=0    ; skip once
+```
+
+Defaults (`line_purge.cfg`): 25 mm margin from object bounds, 48 mm purge length, 12 mm³/s flow, fallback corner X15 Y15 when no object data.
+
+### Slicer start / end g-code
+
+Replace the long OEM Sovol block (M140/M190, double G28, manual purge lines, M104/M109) with:
+
+**Start** — copy from `slicer/Sovol-OrcaSlicer-start.gcode`:
+```gcode
+M117
+START_PRINT BED=[bed_temperature_initial_layer_single] HOTEND=[nozzle_temperature_initial_layer] CHAMBER=[chamber_temperature]
+SET_PRINT_STATS_INFO TOTAL_LAYER=[total_layer_count]
+G90
+```
+
+**End**:
+```gcode
+END_PRINT
+```
+
+`START_PRINT` is an alias for `PRINT_START`. The macro handles homing, bed/chamber heat, load-cell Z offset, eddy mesh, skew profile, and `LINE_PURGE`. Do not duplicate heat, home, or purge commands in the slicer.
+
+If your slicer profile has no chamber variable, use `CHAMBER=0`.
+
+</details>
 
 ## Klipper shows "dirty" — that's OK
 
@@ -144,12 +201,7 @@ canbus_uuid: <your toolhead mcu>
 
 - `probe_pressure.py` — derived from Sovol OEM Klipper (GPLv3), based on upstream Klipper probe code
 - `axis_twist_pressure.py` — GPLv3; patches mainline axis twist cal to use load cell nozzle touch
-
-## Support
-
-If this config helped you, consider buying me a coffee:
-
-**[ko-fi.com/0dysseusrex](https://ko-fi.com/0dysseusrex)**
+- `line_purge.cfg` — adapted from [pellcorp/creality](https://github.com/pellcorp/creality) (SimpleAF) `_LINE_PURGE` and KAMP
 
 ## License
 
