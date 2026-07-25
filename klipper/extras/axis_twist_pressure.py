@@ -12,7 +12,7 @@ class AxisTwistPressure:
         self.printer.register_event_handler("klippy:connect",
                                             self._handle_connect)
 
-    def _handle_connect(self):
+    def _handle_connect(self, eventtime=None):
         atc = self.printer.lookup_object('axis_twist_compensation', None)
         if atc is None:
             return

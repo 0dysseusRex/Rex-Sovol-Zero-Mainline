@@ -123,6 +123,26 @@ class PrinterProbePressure:
         return self.lift_speed
     def get_offsets(self):
         return self.x_offset, self.y_offset, self.z_offset
+    def _get_axis_twist_z_compensation(self, pos):
+        axis_twist = self.printer.lookup_object(
+            'axis_twist_compensation', None)
+        if axis_twist is None:
+            return 0.
+        calibrater = axis_twist.calibrater
+        if calibrater.results is not None:
+            return 0.
+        zo = 0.
+        if axis_twist.z_compensations:
+            zo += axis_twist._get_interpolated_z_compensation(
+                pos[0], axis_twist.z_compensations,
+                axis_twist.compensation_start_x,
+                axis_twist.compensation_end_x)
+        if axis_twist.zy_compensations:
+            zo += axis_twist._get_interpolated_z_compensation(
+                pos[1], axis_twist.zy_compensations,
+                axis_twist.compensation_start_y,
+                axis_twist.compensation_end_y)
+        return zo
     def _probe(self, speed):
         toolhead = self.printer.lookup_object('toolhead')
         curtime = self.printer.get_reactor().monotonic()
@@ -139,15 +159,7 @@ class PrinterProbePressure:
             if "Timeout during endstop homing" in reason:
                 reason += HINT_TIMEOUT
             raise self.printer.command_error(reason)
-        # get z compensation from axis_twist_compensation
-        axis_twist_compensation = self.printer.lookup_object(
-            'axis_twist_compensation', None)
-        z_compensation = 0
-        if axis_twist_compensation is not None:
-            z_compensation = (
-                axis_twist_compensation.get_z_compensation_value(pos))
-        # add z compensation to probe position
-        epos[2] += z_compensation
+        epos[2] += self._get_axis_twist_z_compensation(pos)
         self.gcode.respond_info("probe at %.3f,%.3f is z=%.6f"
                                 % (epos[0], epos[1], epos[2]))
         return epos[:3]

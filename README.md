@@ -6,6 +6,7 @@ Working Klipper configuration and addons for the **Sovol Zero** on **mainline Kl
 
 - **`probe_eddy_current`** — toolhead eddy probe for Z homing, mesh, and scanning
 - **`probe_pressure`** — bed load cell (PD9 tare / PD10 trigger) for nozzle-touch Z offset
+- **`axis_twist_pressure`** — axis twist calibration using eddy probe + load cell (replaces paper test)
 
 This replaces Sovol stock `[z_offset_calibration]` with mainline `probe_eddy_current` + `probe_pressure`.
 
@@ -16,10 +17,34 @@ This replaces Sovol stock `[z_offset_calibration]` with mainline `probe_eddy_cur
 | Coarse Z homing | LDC1612 eddy on toolhead | `[probe_eddy_current eddy]` → `stepper_z` virtual endstop |
 | Fine Z offset | Bed strain gauge via external HX711 board | `[probe_pressure]` on PD10, tare on PD9 |
 | Mesh / scan | Eddy probe | `BED_MESH_CALIBRATE`, `PROBE METHOD=scan` |
+| Axis twist compensation | Eddy at probe offset + load cell nozzle touch | `[axis_twist_compensation]` + `[axis_twist_pressure]` |
 
 ```
 G28 X Y  →  G28 Z (eddy)  →  RUN_PROBE_PRESSURE (load cell)  →  SET_GCODE_OFFSET  →  G28 Z
 ```
+
+### Axis twist compensation
+
+Axis twist corrects the Z difference between where the **eddy probe** reads the bed and where the **nozzle** actually touches, as you move in X and Y.
+
+| Calibration step | Sensor |
+|---|---|
+| Probe-side height (at eddy offset) | Eddy (`probe.run_single_probe`) |
+| Nozzle-side height (at bed point) | Load cell (`RUN_PROBE_PRESSURE`) |
+
+Both **X** and **Y** axes are supported. Calibrate each axis separately; results are stored as `z_compensations` (X) and `zy_compensations` (Y) in `SAVE_CONFIG`. After calibration, compensation is applied automatically to eddy probe results and load cell touches.
+
+```
+G28
+AXIS_TWIST_COMPENSATION_CALIBRATE          ; X axis (default)
+SAVE_CONFIG
+
+G28
+AXIS_TWIST_COMPENSATION_CALIBRATE AXIS=Y   ; Y axis
+SAVE_CONFIG
+```
+
+Cal sweep ranges are in `probe_pressure.cfg` (default 20–132 mm at bed center).
 
 ## Repository layout
 
@@ -27,11 +52,12 @@ G28 X Y  →  G28 Z (eddy)  →  RUN_PROBE_PRESSURE (load cell)  →  SET_GCODE_
 config/
   printer.cfg          Full printer config (includes other macro files on the live machine)
   sovol_eddy.cfg       Eddy probe, bed mesh, eddy helper macros
-  probe_pressure.cfg   Load cell probe + BED_LOADCELL_Z_OFFSET macro
+  probe_pressure.cfg   Load cell probe, axis twist, BED_LOADCELL_Z_OFFSET macro
   Macro.cfg            Print lifecycle macros (PRINT_START, G28, etc.)
 
 klipper/extras/
-  probe_pressure.py    Sovol bed load cell module (required)
+  probe_pressure.py         Sovol bed load cell module (required)
+  axis_twist_pressure.py    Load cell nozzle touch for axis twist cal (required)
 
 docs/
   INSTALL.md
@@ -48,7 +74,7 @@ git clone https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline.git
 cd Rex-Sovol-Zero-Mainline
 ```
 
-1. Copy `klipper/extras/probe_pressure.py` into your Klipper tree:
+1. Install Klipper extras into your Klipper tree (copies `probe_pressure.py` and `axis_twist_pressure.py`):
    ```bash
    ./scripts/install-probe-pressure.sh ~/klipper
    ```
@@ -73,7 +99,7 @@ See also [docs/KLIPPER_UPDATES.md](docs/KLIPPER_UPDATES.md) for keeping Klipper 
 
 ## Klipper shows "dirty" — that's OK
 
-After installing `probe_pressure.py`, Moonraker and Klipper may report the repo as **dirty** (e.g. `v0.13.0-708-g7046bd00-dirty`) because `klippy/extras/probe_pressure.py` is an **untracked** file in the upstream Klipper tree.
+After installing `probe_pressure.py` and `axis_twist_pressure.py`, Moonraker and Klipper may report the repo as **dirty** (e.g. `v0.13.0-708-g7046bd00-dirty`) because those files are **untracked** in the upstream Klipper tree.
 
 This is **normal and expected**. It does **not** block `git pull` or cause update problems, as long as you have **no modified tracked files** (don't patch `bed_mesh.py`, `src/Makefile`, etc.).
 
@@ -84,6 +110,7 @@ Untracked extras = fine. Modified upstream files = update headaches.
 These **must be calibrated per printer** and live in the `SAVE_CONFIG` block of `printer.cfg`:
 
 - `[probe_eddy_current eddy]` → `reg_drive_current`, `calibrate`
+- `[axis_twist_compensation]` → `z_compensations`, `zy_compensations` (after axis twist cal)
 - `[bed_mesh]` mesh points
 - `[input_shaper]`, PID, skew, etc.
 
@@ -109,6 +136,7 @@ canbus_uuid: <your toolhead mcu>
 ## Credits
 
 - `probe_pressure.py` — derived from Sovol OEM Klipper (GPLv3), based on upstream Klipper probe code
+- `axis_twist_pressure.py` — GPLv3; patches mainline axis twist cal to use load cell nozzle touch
 
 ## Support
 
