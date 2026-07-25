@@ -1,0 +1,10 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.bak
+*~
+
+# Local secrets (never commit)
+.env
+*.secret

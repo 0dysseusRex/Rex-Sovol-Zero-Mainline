@@ -1,0 +1,9 @@
+                    GNU GENERAL PUBLIC LICENSE
+                       Version 3, 29 June 2007
+
+This repository contains Klipper-derived code licensed under GPLv3.
+See klipper/extras/probe_pressure.py and klipper/extras/probe_eddy_ng.py
+for upstream copyright notices.
+
+Configuration files (config/*.cfg) are provided as reference documentation
+without a separate license unless otherwise noted.
