@@ -36,13 +36,15 @@ Both **X** and **Y** axes are supported. Calibrate each axis separately; results
 
 ```
 G28
-AXIS_TWIST_COMPENSATION_CALIBRATE          ; X axis (default)
+AXIS_TWIST_COMPENSATION_CALIBRATE          ; X axis — 4 points (12, ~25, ~37, 50 at Y=20)
 SAVE_CONFIG
 
 G28
-AXIS_TWIST_COMPENSATION_CALIBRATE AXIS=Y   ; Y axis
+AXIS_TWIST_COMPENSATION_CALIBRATE AXIS=Y   ; Y axis — 4 points (12, 24, 36, 48 at X=25)
 SAVE_CONFIG
 ```
+
+Default is **4 evenly-spaced points** per axis (macro wrapper). Override with `SAMPLE_COUNT=5` if needed. Points stay within the load-cell zone; extending the range to keep the old 3-point spacing would put the extra point too far from the sensor.
 
 Cal sweep ranges are in `probe_pressure.cfg`. They are **limited to the bed load cell location (~X25 Y20)** — nozzle touches must stay near the sensor. Eddy probe steps still run at the full probe-offset positions along each sweep; twist values extrapolate outside the cal range during mesh and print.
 

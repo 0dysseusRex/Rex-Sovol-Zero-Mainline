@@ -71,13 +71,15 @@ The load cell is under **~X25 Y20**. Nozzle touches during calibration must stay
 
 ```
 G28
-AXIS_TWIST_COMPENSATION_CALIBRATE          ; X sweep 12–50 at Y=20
+AXIS_TWIST_COMPENSATION_CALIBRATE          ; X sweep — 4 points at Y=20
 SAVE_CONFIG
 
 G28
-AXIS_TWIST_COMPENSATION_CALIBRATE AXIS=Y   ; Y sweep 12–48 at X=25
+AXIS_TWIST_COMPENSATION_CALIBRATE AXIS=Y   ; Y sweep — 4 points at X=25
 SAVE_CONFIG
 ```
+
+Default **4 evenly-spaced points** per axis (was 3). Override with `SAMPLE_COUNT=5` etc. if needed.
 
 Eddy probe steps still run at probe offsets along each sweep. Twist compensation extrapolates outside the calibrated range for mesh and print moves.
 
