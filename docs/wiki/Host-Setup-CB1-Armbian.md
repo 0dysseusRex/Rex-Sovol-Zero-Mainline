@@ -2,7 +2,7 @@
 
 The **CB1** is the Linux computer inside the Zero's base. Replacing Sovol's image with **Armbian** gives you a standard, updatable Linux host for mainline Klipper.
 
-Primary reference: **[asnajder/zero-config — Initial Setup](https://github.com/asnajder/zero-config#initial-setup)**
+Primary reference: **[asnajder/zero-config — Initial Setup](https://github.com/asnajder/zero-config#initial-setup)** (note: zero-config text may describe other CB1 eMMC mounting styles — Sovol Zero uses a **Makerbase header module**; see below)
 
 Alternative deep-dive: **[sovol.lexfrei.dev — OS layer](https://sovol.lexfrei.dev)**
 
@@ -20,20 +20,42 @@ Your configs are backed up separately — the eMMC flash **wipes** the old OS.
 
 ---
 
+## Sovol Zero eMMC module type (important)
+
+The Zero CB1 does **not** use a spring-slot "SD-like" eMMC socket. It uses a **Makerbase / BTT-style eMMC module**:
+
+- Small PCB module (often labeled **Makerbase**, e.g. `M-K-XX-02079`)
+- Plugs onto a **2×10 pin header** on the CB1
+- Held down with **two screws** (one at each end of the module)
+
+Other guides (including some CB1 photos online) show a **push-to-release clip** — that is a **different** mounting style. Follow the steps below for the **Sovol Zero**.
+
+**Replacement modules:** A Makerbase or BTT **32 GB eMMC module** with the same **2×10 header** footprint as the CB1 works (e.g. Makerbase `M-K-XX-02079` style). Match the module PCB form factor — not a bare eMMC chip or microSD card.
+
+---
+
 ## Remove the eMMC module
 
-1. **Unplug printer** from wall.  
-2. Remove base cover (Sovol service panel).  
-3. Locate CB1 board — eMMC is a small removable module (looks like micro SD but **not** compatible with SD slots).  
-4. Push spring clip, slide eMMC out.  
+1. **Unplug the printer** from the wall and allow capacitors to discharge.  
+2. Remove the **base cover** (Sovol service panel).  
+3. Locate the **CB1** board and the **Makerbase eMMC module** sitting on a header socket near the CB1.  
+4. **Remove the two screws** that hold the eMMC module to the standoffs (small Phillips — same family as your cover screws; don't strip them).  
+5. **Pull the module straight up** off the header — gentle, even pressure on both ends.  
+   - Do **not** pry at an angle; you can bend the header pins.  
+   - If it resists, confirm both screws are fully out.  
+6. Set the module aside on a non-static surface.
 
-**Why remove it?** USB eMMC readers can't attach while inside the printer.
+**Why remove it?** You flash Armbian from a PC using a **USB eMMC reader/adapter** that accepts this **module PCB**, not while it is still plugged into the printer.
+
+> **Do not** try to slide it out like microSD or push a spring clip — the Zero module is **header + screws** only.
 
 ---
 
 ## Flash Armbian with Armbian Imager
 
-1. Insert eMMC into **USB eMMC reader** on your PC.  
+1. Insert the **Makerbase eMMC module** into a compatible **USB eMMC reader/adapter** on your PC.  
+   - Use an adapter meant for **BTT/Makerbase CB1 eMMC modules** (module plugs into the adapter socket).  
+   - The module is **not** a microSD card — it will not fit a normal SD card reader.
 2. Open [Armbian Imager](https://www.armbian.com/download/).  
 3. Select:
    - **Manufacturer:** BTT (BIQU)  
@@ -46,8 +68,8 @@ Your configs are backed up separately — the eMMC flash **wipes** the old OS.
 
 | Module | Guidance |
 |---|---|
-| **32 GB** (recommended) | Works out of the box per [zero-config](https://github.com/asnajder/zero-config#prerequisites) |
-| **Stock 8 GB** | May fail or corrupt without [lexfrei's 40 MHz eMMC overlay](https://sovol.lexfrei.dev) — beginners should buy 32 GB |
+| **32 GB Makerbase/BTT module** (recommended) | Works out of the box per [zero-config](https://github.com/asnajder/zero-config#prerequisites) |
+| **Stock 8 GB** (factory Makerbase module) | May fail or corrupt without [lexfrei's 40 MHz eMMC overlay](https://sovol.lexfrei.dev) — beginners should use 32 GB |
 
 ---
 
@@ -77,12 +99,21 @@ usbstoragequirks=0x2537:0x1066:u,0x2537:0x1068:u
 
 ---
 
+## Reinstall the eMMC module (after flashing)
+
+1. **Power off** — printer still unplugged from wall.  
+2. Align the module **2×10 header** with the socket on the CB1 — match **pin 1** orientation (check silkscreen on CB1 and module; do not reverse).  
+3. Press the module **straight down** onto the header until fully seated.  
+4. Reinstall **both screws** — snug only; do not overtighten (PCB standoffs can crack).  
+5. Reassemble the base cover before applying power.
+
+---
+
 ## First boot in printer
 
-1. Reinstall eMMC on CB1.  
-2. Connect **Ethernet** to router (recommended).  
-3. Power on printer.  
-4. Wait 2–5 minutes for first boot (longer first time).
+1. Connect **Ethernet** to router (recommended).  
+2. Power on printer.  
+3. Wait 2–5 minutes for first boot (longer first time).
 
 ### Login options
 

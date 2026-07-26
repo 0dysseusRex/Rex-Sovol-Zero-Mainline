@@ -37,14 +37,14 @@ You do **not** need to be a programmer. You **do** need patience, the ability to
 
 | Item | Why you need it |
 |---|---|
-| **USB eMMC reader** | Remove CB1 eMMC module and flash Armbian from your PC |
+| **USB eMMC reader/adapter (BTT/Makerbase module type)** | Flash Armbian after removing the header-mounted eMMC module from the CB1 |
 | **Know your probe hardware** | **Bed load cell present?** → default Rex path. **Eddy only?** → [Eddy-Only Configuration](Eddy-Only-Configuration) |
-| **32 GB eMMC module** (recommended) | [asnajder/zero-config](https://github.com/asnajder/zero-config) recommends 32 GB. Stock 8 GB *can* work with a special overlay ([lexfrei](https://sovol.lexfrei.dev)) — beginners should use 32 GB to avoid that extra step |
+| **32 GB Makerbase/BTT eMMC module** (recommended) | Same **2×10 header** style as stock; [zero-config](https://github.com/asnajder/zero-config) recommends 32 GB. Stock 8 GB *can* work with [lexfrei's 40 MHz overlay](https://sovol.lexfrei.dev) |
 | **Ethernet cable** (recommended for first boot) | More reliable than Wi-Fi during setup |
 | **USB keyboard + HDMI monitor** (optional) | Alternative to SSH for Armbian first login |
 | **ST-LINK V2** (or compatible clone) | Flash/recover MCU firmware when CAN flash fails |
 | **STM32CubeProgrammer** (free, ST Micro) | GUI for ST-LINK read/flash — easier than command line for beginners |
-| **Small Phillips screwdriver** | Open base panel, toolhead cover for SWD access |
+| **Small Phillips screwdriver** | Base panel, **two eMMC module screws**, toolhead cover for ST-LINK |
 | **PC with Windows/Mac/Linux** | Armbian Imager, PuTTY, WinSCP |
 
 ---
