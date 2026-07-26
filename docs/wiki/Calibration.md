@@ -202,7 +202,9 @@ Optional: skew correction, chamber PID (if using Rex chamber macros).
 
 ## Nozzle clean before probing
 
-`PRINT_START` calls `CLEAN_NOZZLE` (brush + silicone wipe at 250°C → cooldown). Reduces false load cell triggers from plastic blobs.
+`PRINT_START` calls `CLEAN_NOZZLE` — the **stock Sovol silicone wiper** macro (heat to 200°C, wipe, cool to 130°C). Reduces false load cell triggers from plastic blobs.
+
+**Optional brass wire brush mod:** If you install the [Sovol Zero brass brush](https://makerworld.com/en/models/2225406-sovol-zero-brass-brush) on the left side of the bed, uncomment `CLEAN_NOZZLE_BRASS` in `Macro.cfg` and swap it in place of `CLEAN_NOZZLE` (see repo README).
 
 **Display menu:** Prepare → Calibration → **Clean Nozzle**
 

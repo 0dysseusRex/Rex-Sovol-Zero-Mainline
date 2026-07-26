@@ -173,6 +173,23 @@ canbus_uuid: <your toolhead mcu>
 Optional quality-of-life additions included in this repo. Not required for eddy + load cell probing.
 
 <details>
+<summary>Brass wire brush nozzle clean (optional hardware mod)</summary>
+
+The default `CLEAN_NOZZLE` macro matches **stock Sovol** — silicone wiper pad only ([OEM Macro.cfg](https://github.com/Sovol3d/SOVOL-ZERO/blob/main/sovol/printer_data/config/Macro.cfg), adapted for mainline by omitting `RUN_PROBE_VIR_CONTACT`).
+
+If you install the community **brass wire brush** mount:
+
+**[Sovol Zero brass brush — MakerWorld](https://makerworld.com/en/models/2225406-sovol-zero-brass-brush)**
+
+1. Open `config/Macro.cfg`
+2. Comment out the active `[gcode_macro CLEAN_NOZZLE]` block
+3. Uncomment `[gcode_macro CLEAN_NOZZLE_BRASS]` and rename it to `CLEAN_NOZZLE` (or call `CLEAN_NOZZLE_BRASS` from `PRINT_START` and the display menu)
+
+The brass macro heats to 250°C, scrubs on the brush at `X-10`, then finishes on the OEM silicone wiper before load cell probing.
+
+</details>
+
+<details>
 <summary>Line purge &amp; slicer start g-code</summary>
 
 ### Line purge

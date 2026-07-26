@@ -69,6 +69,7 @@ This wiki and the [Rex-Sovol-Zero-Mainline](https://github.com/0dysseusRex/Rex-S
 |---|---|
 | **[Sovol3d/SOVOL-ZERO](https://github.com/Sovol3d/SOVOL-ZERO)** | OEM source — third-party firmware may void warranty |
 | **[Sovol forum](https://forum.sovol3d.com/)** | Community support |
+| **[Sovol Zero brass brush (MakerWorld)](https://makerworld.com/en/models/2225406-sovol-zero-brass-brush)** | Optional nozzle brush mod — use `CLEAN_NOZZLE_BRASS` in Rex `Macro.cfg` |
 
 ---
 

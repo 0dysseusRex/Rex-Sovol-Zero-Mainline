@@ -132,7 +132,7 @@ gcode:
         M190 S{bed}
     {% endif %}
 
-    # Optional — helps mesh accuracy; remove if you skip nozzle clean
+    # Optional — OEM silicone wipe; brass brush mod: use CLEAN_NOZZLE_BRASS instead
     CLEAN_NOZZLE
 
     {% if hotend > 0 %}

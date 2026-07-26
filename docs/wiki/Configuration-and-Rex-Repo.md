@@ -129,7 +129,7 @@ From [Rex Macro.cfg template](https://github.com/0dysseusRex/Rex-Sovol-Zero-Main
 |---|---|
 | `G28` | Safe Z homing until eddy calibrated |
 | `PRINT_START` / `START_PRINT` | Bed heat → nozzle clean → load cell Z → mesh |
-| `CLEAN_NOZZLE` | Brush + silicone wipe before probing |
+| `CLEAN_NOZZLE` | OEM silicone wiper before probing (optional `CLEAN_NOZZLE_BRASS` for brush mod) |
 | `END_PRINT` | Park, cooldown |
 
 If migrating from stock Sovol `Macro.cfg`, **merge** — don't duplicate `PAUSE`/`RESUME`/`CANCEL_PRINT` unless you intend to override [mainsail.cfg](https://github.com/mainsail-crew/mainsail-config) versions.
