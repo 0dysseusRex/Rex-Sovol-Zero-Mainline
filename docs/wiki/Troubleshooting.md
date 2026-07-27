@@ -110,14 +110,14 @@ Run `EDDY_CALIBRATE_PREP` or `SET_KINEMATIC_POSITION Z=<known>`
 
 **Cause:** Sovol OEM park positions sit on the edge of `stepper_y position_max: 152.5`. CoreXY rounding pushes moves slightly over (e.g. `152.526`). Cancel/END_PRINT also parked **before** reliably shutting off heaters — a failed park left heat on.
 
-**Fix:** Include Rex `pause_cancel_macros.cfg` **after** `Macro.cfg`:
+**Fix:** Include Rex `pause_cancel_macros.cfg` **after** `Macro.cfg` and **remove** `PAUSE`, `CANCEL_PRINT`, and `END_PRINT` from `Macro.cfg` (stock Sovol OEM defines all three — delete or comment them out):
 
 ```ini
 [include Macro.cfg]
 [include pause_cancel_macros.cfg]
 ```
 
-This overrides `PAUSE`, `CANCEL_PRINT`, and `END_PRINT` with clamped `_PARK_SAFE` / `_LIFT_Z_SAFE` helpers and turns heaters off before parking.
+This file is the **only** definition of those three macros. It calls mainsail’s `PAUSE_BASE` / `CANCEL_PRINT_BASE` (not a second Sovol park pass), uses clamped `_PARK_SAFE` / `_LIFT_Z_SAFE`, and turns heaters off via mainsail before optional safe park on cancel.
 
 If you use the **brass brush** `CLEAN_NOZZLE`, avoid `X=-10` (use `-9.5` or higher) — `stepper_x position_min` is `-10` and the move can overshoot to `-10.025`.
 

@@ -68,6 +68,7 @@ cp ~/Rex-Sovol-Zero-Mainline/config/probe_pressure.cfg ~/printer_data/config/
 cp ~/Rex-Sovol-Zero-Mainline/config/GP3D_Macro.cfg ~/printer_data/config/
 cp ~/Rex-Sovol-Zero-Mainline/config/Rex_Macros.cfg ~/printer_data/config/
 cp ~/Rex-Sovol-Zero-Mainline/config/display_macros.cfg ~/printer_data/config/
+cp ~/Rex-Sovol-Zero-Mainline/config/pause_cancel_macros.cfg ~/printer_data/config/
 ```
 
 **Eddy-only:** copy only `sovol_eddy.cfg` — omit `probe_pressure.cfg`. Details: [Eddy-Only Configuration](Eddy-Only-Configuration).
@@ -86,6 +87,7 @@ Add near top of `~/printer_data/config/printer.cfg` (order matters):
 ```ini
 [include mainsail.cfg]
 [include Macro.cfg]
+[include pause_cancel_macros.cfg]
 [include GP3D_Macro.cfg]
 [include Rex_Macros.cfg]
 [include display_macros.cfg]
@@ -94,7 +96,7 @@ Add near top of `~/printer_data/config/printer.cfg` (order matters):
 # [include line_purge.cfg]    ; optional
 ```
 
-**Why order?** Later files override earlier macros; display menus extend GP3D menus.
+**Why order?** `pause_cancel_macros.cfg` must load **after** `Macro.cfg` and defines `PAUSE`, `CANCEL_PRINT`, and `END_PRINT`. Do **not** duplicate those three in `Macro.cfg`. Later includes override earlier macros for everything else.
 
 ---
 
@@ -130,9 +132,10 @@ From [Rex Macro.cfg template](https://github.com/0dysseusRex/Rex-Sovol-Zero-Main
 | `G28` | Safe Z homing until eddy calibrated |
 | `PRINT_START` / `START_PRINT` | Bed heat → nozzle clean → load cell Z → mesh |
 | `CLEAN_NOZZLE` | OEM silicone wiper before probing (optional `CLEAN_NOZZLE_BRASS` for brush mod) |
-| `END_PRINT` | Park, cooldown |
 
-If migrating from stock Sovol `Macro.cfg`, **merge** — don't duplicate `PAUSE`/`RESUME`/`CANCEL_PRINT` unless you intend to override [mainsail.cfg](https://github.com/mainsail-crew/mainsail-config) versions.
+**Pause / cancel / end:** use `[include pause_cancel_macros.cfg]` after `Macro.cfg` — do **not** also define `PAUSE`, `CANCEL_PRINT`, or `END_PRINT` in `Macro.cfg`.
+
+If migrating from stock Sovol `Macro.cfg`, **remove** those three macros from `Macro.cfg` and keep `RESUME` / load-filament macros there. Do not duplicate `PAUSE`/`RESUME`/`CANCEL_PRINT` unless you intend to override [mainsail.cfg](https://github.com/mainsail-crew/mainsail-config) versions without using `pause_cancel_macros.cfg`.
 
 ---
 

@@ -73,7 +73,7 @@ Default sweeps: X 12–50 mm at Y=20; Y 12–48 mm at X=25.
 ```
 config/
   printer.cfg          Merge template — NOT a full config (see below)
-  Macro.cfg            Merge template — G28, PRINT_START, END_PRINT only
+  Macro.cfg            Merge template — G28, PRINT_START (pause/cancel in pause_cancel_macros.cfg)
   GP3D_Macro.cfg       Stock display menus (shutdown, heat soak, Z save)
   Rex_Macros.cfg       Nozzle lights + chamber preheat
   display_macros.cfg   UC1701 calibration / tune / lights menus
@@ -126,7 +126,7 @@ cd Rex-Sovol-Zero-Mainline
 
 3. **Merge** `config/printer.cfg` into your existing `printer.cfg` (includes, `[stepper_z]` endstop, `[safe_z_home]`, `[force_move]`). Do not overwrite your whole file.
 
-4. **Merge** `config/Macro.cfg` into your macros (`G28`, `PRINT_START`, `END_PRINT` at minimum).
+4. **Merge** `config/Macro.cfg` into your macros (`G28`, `PRINT_START` at minimum) and add `[include pause_cancel_macros.cfg]` after it.
 
 5. Restart Klipper and follow [docs/CALIBRATION.md](docs/CALIBRATION.md).
 

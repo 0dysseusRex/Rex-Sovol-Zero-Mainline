@@ -62,7 +62,8 @@ Merge from `config/Macro.cfg` into **your** macro file (or `[include Macro.cfg]`
 | `G28` | Block Z home until eddy `calibrate` exists in SAVE_CONFIG |
 | `PRINT_START` | Bed heat → load cell Z offset → eddy mesh |
 | `START_PRINT` | Slicer alias for `PRINT_START` |
-| `END_PRINT` | Minimal end routine — customize park/cooldown |
+
+Add `[include pause_cancel_macros.cfg]` after `Macro.cfg` for `PAUSE`, `CANCEL_PRINT`, and `END_PRINT`. Do **not** keep Sovol OEM copies of those macros in `Macro.cfg`.
 
 Remove Sovol-fork references such as `PROBE_EDDY_NG_SET_TAP_OFFSET` from your end macro if present.
 
