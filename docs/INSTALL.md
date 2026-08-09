@@ -23,6 +23,12 @@ cd Rex-Sovol-Zero-Mainline
 
 This copies `probe_pressure.py` and `axis_twist_pressure.py` into your Klipper tree.
 
+For UC1701 display IP address (used by `display_macros.cfg`):
+
+```bash
+./scripts/install-network-status.sh ~/klipper
+```
+
 ## 2. Deploy included config snippets
 
 ```bash
@@ -38,7 +44,7 @@ Add to your include list in `printer.cfg` (order matters):
 [include display_macros.cfg]
 ```
 
-`display_macros.cfg` extends the stock UC1701 menus with load cell / eddy calibration, Z offset save, chamber preheat, and lights. It must load **after** `GP3D_Macro.cfg` and `Rex_Macros.cfg`.
+`display_macros.cfg` extends the stock UC1701 menus with load cell / eddy calibration, Z offset save, chamber preheat, network IP, and lights. It must load **after** `GP3D_Macro.cfg` and `Rex_Macros.cfg`. Run `install-network-status.sh` so the IP line and Setup → Network menu work.
 
 ## 3. Merge `printer.cfg`
 

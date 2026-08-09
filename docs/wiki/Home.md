@@ -102,6 +102,7 @@ Phase 6–7 ──────────┤
 | 7 | [CAN Bus and MCU Flashing](CAN-Bus-and-MCU-Flashing) | UUID discovery, menuconfig values, flash all three MCUs |
 | 8 | [Configuration and Rex Repo](Configuration-and-Rex-Repo) | Merge configs — **default: eddy + load cell** |
 | 8b | [Eddy-Only Configuration](Eddy-Only-Configuration) | **Alternate:** no bed load cell |
+| 8c | [UC1701 Display and Menus](UC1701-Display-and-Menus) | Knob screen layout, icons, menu reference |
 | 9 | [Calibration](Calibration) | Path A: load cell + eddy cal |
 | 10 | [Troubleshooting](Troubleshooting) | Common errors and fixes |
 | 11 | [Credits and Resources](Credits-and-Resources) | Repos, docs, and people who made this possible |

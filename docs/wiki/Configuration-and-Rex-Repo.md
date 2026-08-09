@@ -141,18 +141,31 @@ If migrating from stock Sovol `Macro.cfg`, **remove** those three macros from `M
 
 ## Display menus (UC1701 knob screen)
 
-`display_macros.cfg` adds:
+Full reference: **[UC1701 Display and Menus](UC1701-Display-and-Menus)** — status screen layout, chamber and filament icons, menu tree, and basic knob use.
 
-**Prepare → Calibration:** Clean Nozzle, Load Cell Z Touch, Eddy Cal Prep, Axis Twist Cal, Chamber Preheat  
+Quick summary — `display_macros.cfg` adds:
+
+**Idle status line:** optional IP (off by default; **Setup → Network → Show IP** to toggle)  
+**Status rows:** filament spool + **Yes/No** (row 0 right); chamber icon + temp (row 1 right)  
+**Control (top):** Front And Center, Clean Nozzle  
+**Temperature (top):** Chamber Preheat, Stop Preheat  
+**Filament:** load / unload 60 mm (fast and slow)  
+**Prepare → Calibration:** Load Cell Z Touch, Eddy Cal Prep, Axis Twist Cal, Test Load Cell  
 **Tune:** Save Z Offset, End Print + Save Z  
+**Setup → Network:** Ethernet IP, Wi-Fi IP, SSID, mDNS hostname  
 **Setup → Lights:** On / Off / Breathe  
+
+The stock Klipper **OctoPrint** menu is **hidden** by default (optional commented block in `display_macros.cfg`).
+
+Install the network plugin once on the host:
+
+```bash
+~/Rex-Sovol-Zero-Mainline/scripts/install-network-status.sh
+```
 
 Requires stock `[display]` section in `printer.cfg` (UC1701).
 
-**Display knob reversed?** Swap encoder pins per [zero-config finishing notes](https://github.com/asnajder/zero-config#finishing-up):
-```ini
-encoder_pins: ^EXP2_3, ^EXP2_5
-```
+**Display knob reversed?** See [UC1701 Display and Menus — Troubleshooting](UC1701-Display-and-Menus#troubleshooting).
 
 **KlipperScreen alternative:** [lexfrei sovol_codes plugin](https://github.com/lexfrei/sovol-zero-mainline/tree/main/klipper-plugin) reproduces vendor numeric codes on HDMI — optional.
 

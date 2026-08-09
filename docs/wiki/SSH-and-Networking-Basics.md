@@ -19,7 +19,7 @@ The CB1 must be on the **same network** as your PC (usually your home Wi-Fi or r
    - `SPI-XI` (stock Sovol hostname)
    - `sovol-zero` (if you renamed it)
 
-Write down the IP, e.g. `192.168.1.72`.
+Write down the IP, e.g. `192.168.11.186` (Mainsail: `http://192.168.11.186/`).
 
 **Why:** SSH needs an IP address — there is no "search" button in PuTTY.
 
@@ -62,7 +62,7 @@ After Armbian first boot you create your own user (e.g. `rex`). **Write down the
 ## Connect with PuTTY (Windows)
 
 1. Download and open **PuTTY**.  
-2. **Host Name:** `192.168.1.72` (your IP)  
+2. **Host Name:** `192.168.11.186` (your IP)  
 3. **Port:** `22`  
 4. **Connection type:** SSH  
 5. Click **Open**.  
@@ -78,7 +78,7 @@ Password **will not show** while typing — that is normal.
 ## Connect from PowerShell (Windows 10/11)
 
 ```powershell
-ssh yourusername@192.168.1.72
+ssh yourusername@192.168.11.186
 ```
 
 ---
