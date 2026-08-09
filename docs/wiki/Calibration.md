@@ -222,6 +222,8 @@ Optional: skew correction, chamber PID (if using Rex chamber macros).
 
 ## Next step
 
+Use the knob screen for day-to-day tasks → **[UC1701 Display and Menus](UC1701-Display-and-Menus)**
+
 Problems? → **[Troubleshooting](Troubleshooting)**
 
 Happy printing? Star [Rex-Sovol-Zero-Mainline](https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline) and consider [ko-fi.com/0dysseusrex](https://ko-fi.com/0dysseusrex)

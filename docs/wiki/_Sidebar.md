@@ -16,8 +16,8 @@
 ### Software setup
 - [Configuration and Rex Repo](Configuration-and-Rex-Repo) — **Path A: eddy + load cell**
 - [Eddy-Only Configuration](Eddy-Only-Configuration) — **Path B: no load cell**
-- [UC1701 Display and Menus](UC1701-Display-and-Menus) — knob screen layout and use
 - [Calibration](Calibration) — Path A calibration
+- [UC1701 Display and Menus](UC1701-Display-and-Menus) — knob screen layout and use
 
 ### Help
 - [Troubleshooting](Troubleshooting)
