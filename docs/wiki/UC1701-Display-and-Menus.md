@@ -141,8 +141,8 @@ Press the knob to open **Main**. Submenus show **`..`** first to go back.
 | **Tune** | Save Z Offset Now | `Z_OFFSET_APPLY_PROBE1` + `SAVE_CONFIG` |
 | **Tune → Save & Exit?** | End Print + Save Z | `END_PRINT_G` |
 | **Filament** | Load / Unload fast & slow | **60 mm** extrude (stock Klipper uses 50 mm) |
-| **Setup → Network** | Show IP, Eth, Wi‑Fi, SSID, mDNS | Toggle and view addresses |
-| **Setup → Lights** | Light On / Off / Breathe | Nozzle LED macros |
+| **Setup → Network** | Show IP, Eth, Wi‑Fi, SSID, signal, mDNS | Toggle and view addresses / Wi‑Fi strength |
+| **Setup → Chamber LED** | LED On / Off / Brightness % | `main_led` interior strip |
 
 ---
 
@@ -169,6 +169,25 @@ Press the knob to open **Main**. Submenus show **`..`** first to go back.
 
 - **Setup → Network → Show IP** — toggle idle IP on row 3.
 - Scroll other network lines while highlighted to read full addresses.
+- **Setup → Network → Signal** — RSSI in dBm plus an 8‑segment bar (`####----`); updates every 30s with other network info.
+
+### Knob / display LED color (`Screen_Colour`)
+
+The UC1701 **backlight and knob ring** are three RGB neopixels (`[neopixel Screen_Colour]`, `chain_count: 3`) in `printer.cfg`. Mainsail’s **Miscellaneous → Screen_Colour** picker sends `SET_LED` at runtime only — it does **not** survive reboot.
+
+To persist a color, set `initial_RED`, `initial_GREEN`, and `initial_BLUE` (0.0–1.0) under `[neopixel Screen_Colour]`. Example for **RGB(132, 189, 0)**:
+
+```ini
+[neopixel Screen_Colour]
+pin: EXP1_6
+chain_count: 3
+color_order: RGB
+initial_RED: 0.517647
+initial_GREEN: 0.741176
+initial_BLUE: 0.0
+```
+
+After editing, run **FIRMWARE_RESTART**. To copy values from Mainsail, pick a color and read the `SET_LED` line in the Console (divide each 0–255 channel by 255).
 
 ### Shutdown
 

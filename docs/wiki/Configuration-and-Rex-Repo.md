@@ -152,8 +152,8 @@ Quick summary — `display_macros.cfg` adds:
 **Filament:** load / unload 60 mm (fast and slow)  
 **Prepare → Calibration:** Load Cell Z Touch, Eddy Cal Prep, Axis Twist Cal, Test Load Cell  
 **Tune:** Save Z Offset, End Print + Save Z  
-**Setup → Network:** Ethernet IP, Wi-Fi IP, SSID, mDNS hostname  
-**Setup → Lights:** On / Off / Breathe  
+**Setup → Network:** Ethernet IP, Wi-Fi IP, SSID, Wi-Fi signal, mDNS hostname  
+**Setup → Chamber LED:** On / Off / Brightness %  
 
 The stock Klipper **OctoPrint** menu is **hidden** by default (optional commented block in `display_macros.cfg`).
 
