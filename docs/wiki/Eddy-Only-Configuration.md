@@ -76,7 +76,8 @@ cd ~
 git clone https://github.com/0dysseusRex/Rex-Sovol-Zero-Mainline.git
 cp ~/Rex-Sovol-Zero-Mainline/config/sovol_eddy.cfg ~/printer_data/config/
 # Optional UI macros — omit load-cell-specific display items later
-cp ~/Rex-Sovol-Zero-Mainline/config/GP3D_Macro.cfg ~/printer_data/config/ 2>/dev/null || true
+cp ~/Rex-Sovol-Zero-Mainline/config/Rex_Macros.cfg ~/printer_data/config/ 2>/dev/null || true
+cp ~/Rex-Sovol-Zero-Mainline/config/display_macros.cfg ~/printer_data/config/ 2>/dev/null || true
 cp ~/Rex-Sovol-Zero-Mainline/config/Rex_Macros.cfg ~/printer_data/config/ 2>/dev/null || true
 ```
 

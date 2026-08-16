@@ -8,18 +8,17 @@ The Sovol Zero **knob LCD** (UC1701, 128×64, 16×4 characters) stays useful aft
 |---|---|
 | `printer.cfg` | `[display]` section (pins, contrast) |
 | Klipper `menu.cfg` | Stock menus (Control, Temperature, Filament, …) |
-| `GP3D_Macro.cfg` | Shutdown, bed soak, Z save menus |
-| `display_macros.cfg` | Rex status line, icons, calibration menus, network |
+| `Rex_Macros.cfg` | Chamber preheat, `FRONT_AND_CENTER`, chamber LED macros |
+| `display_macros.cfg` | Shutdown, status line, icons, calibration, network, Z save |
 
 Include order in `printer.cfg`:
 
 ```ini
-[include GP3D_Macro.cfg]
 [include Rex_Macros.cfg]
 [include display_macros.cfg]
 ```
 
-`display_macros.cfg` must load **after** `GP3D_Macro.cfg` and `Rex_Macros.cfg`.
+`display_macros.cfg` must load **after** `Rex_Macros.cfg`.
 
 ---
 
@@ -117,16 +116,7 @@ Press the knob to open **Main**. Submenus show **`..`** first to go back.
 
 **OctoPrint** (stock Klipper submenu for `action:pause` / OctoPrint plugins) is **hidden** in Rex configs. Use Mainsail **Pause / Resume / Cancel** instead. Optional OctoPrint items are preserved as a commented block at the bottom of `display_macros.cfg`.
 
-### GP3D additions (`GP3D_Macro.cfg`)
-
-| Location | Item |
-|---|---|
-| **Prepare** | Bed temp (input), Heat soak |
-| **Tune → Save & Exit?** | End-Save Z-offs, End print + save Z (via `display_macros.cfg`) |
-| **Tune** | Move Z (input) |
-| **Setup** | **Shutdown** (cool hotend, then host shutdown) |
-
-### Rex additions (`display_macros.cfg`)
+### Rex additions (`display_macros.cfg` + `Rex_Macros.cfg`)
 
 | Location | Item | Macro / action |
 |---|---|---|
@@ -139,8 +129,9 @@ Press the knob to open **Main**. Submenus show **`..`** first to go back.
 | **Prepare → Calibration** | Eddy Cal Prep | `EDDY_CALIBRATE_PREP` |
 | **Prepare → Calibration** | Axis Twist Cal | `AXIS_TWIST_COMPENSATION_CALIBRATE` |
 | **Tune** | Save Z Offset Now | `Z_OFFSET_APPLY_PROBE1` + `SAVE_CONFIG` |
-| **Tune → Save & Exit?** | End Print + Save Z | `END_PRINT_G` |
+| **Tune → Save & Exit?** | End-Save Z-offs, End Print + Save Z, Move Z | `_SAVE_Z_LATER`, `END_PRINT_G` |
 | **Filament** | Load / Unload fast & slow | **60 mm** extrude (stock Klipper uses 50 mm) |
+| **Setup** | Shutdown | `SHUTDOWN` — cool hotend, then power off CB1 |
 | **Setup → Network** | Show IP, Eth, Wi‑Fi, SSID, signal, mDNS | Toggle and view addresses / Wi‑Fi strength |
 | **Setup → Chamber LED** | LED On / Off / Brightness % | `main_led` interior strip |
 
@@ -191,7 +182,7 @@ After editing, run **FIRMWARE_RESTART**. To copy values from Mainsail, pick a co
 
 ### Shutdown
 
-- **Setup → Shutdown** — cools hotend below 70 °C with fans, then shuts down the CB1 host (same as GP3D `SHUTDOWN` macro).
+- **Setup → Shutdown** — cools hotend below 70 °C with fans, then shuts down the CB1 host (`SHUTDOWN` macro in `display_macros.cfg`).
 
 ---
 

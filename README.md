@@ -74,9 +74,8 @@ Default sweeps: X 12–50 mm at Y=20; Y 12–48 mm at X=25.
 config/
   printer.cfg          Merge template — NOT a full config (see below)
   Macro.cfg            Merge template — G28, PRINT_START (pause/cancel in pause_cancel_macros.cfg)
-  GP3D_Macro.cfg       Stock display menus (shutdown, heat soak, Z save)
   Rex_Macros.cfg       Chamber preheat + maintenance macros
-  display_macros.cfg   UC1701 calibration / tune / network IP / chamber LED menus (see [wiki: Display and Menus](docs/wiki/UC1701-Display-and-Menus.md))
+  display_macros.cfg   UC1701 shutdown, calibration, network, chamber LED menus (see [wiki: Display and Menus](docs/wiki/UC1701-Display-and-Menus.md))
   sovol_eddy.cfg       Eddy probe, bed mesh, eddy helper macros
   probe_pressure.cfg   Load cell probe, axis twist, BED_LOADCELL_Z_OFFSET
   line_purge.cfg       Adaptive line purge (optional; see Extras)

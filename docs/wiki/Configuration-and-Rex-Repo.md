@@ -65,7 +65,6 @@ Klipper may show **"dirty"** version — normal with untracked extras ([KLIPPER_
 ```bash
 cp ~/Rex-Sovol-Zero-Mainline/config/sovol_eddy.cfg ~/printer_data/config/
 cp ~/Rex-Sovol-Zero-Mainline/config/probe_pressure.cfg ~/printer_data/config/
-cp ~/Rex-Sovol-Zero-Mainline/config/GP3D_Macro.cfg ~/printer_data/config/
 cp ~/Rex-Sovol-Zero-Mainline/config/Rex_Macros.cfg ~/printer_data/config/
 cp ~/Rex-Sovol-Zero-Mainline/config/display_macros.cfg ~/printer_data/config/
 cp ~/Rex-Sovol-Zero-Mainline/config/pause_cancel_macros.cfg ~/printer_data/config/
@@ -88,7 +87,6 @@ Add near top of `~/printer_data/config/printer.cfg` (order matters):
 [include mainsail.cfg]
 [include Macro.cfg]
 [include pause_cancel_macros.cfg]
-[include GP3D_Macro.cfg]
 [include Rex_Macros.cfg]
 [include display_macros.cfg]
 [include sovol_eddy.cfg]

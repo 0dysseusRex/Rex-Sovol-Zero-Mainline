@@ -33,18 +33,17 @@ For UC1701 display IP address (used by `display_macros.cfg`):
 
 ```bash
 cp config/sovol_eddy.cfg config/probe_pressure.cfg ~/printer_data/config/
-cp config/GP3D_Macro.cfg config/Rex_Macros.cfg config/display_macros.cfg ~/printer_data/config/
+cp config/Rex_Macros.cfg config/display_macros.cfg ~/printer_data/config/
 ```
 
 Add to your include list in `printer.cfg` (order matters):
 
 ```ini
-[include GP3D_Macro.cfg]
 [include Rex_Macros.cfg]
 [include display_macros.cfg]
 ```
 
-`display_macros.cfg` extends the stock UC1701 menus with load cell / eddy calibration, Z offset save, chamber preheat, network IP, and chamber LED control. It must load **after** `GP3D_Macro.cfg` and `Rex_Macros.cfg`. Run `install-network-status.sh` so the IP line and Setup → Network menu work.
+`display_macros.cfg` extends the stock UC1701 menus with load cell / eddy calibration, Z offset save, chamber preheat, network IP, and chamber LED control. It must load **after** `Rex_Macros.cfg`. Run `install-network-status.sh` so the IP line and Setup → Network menu work.
 
 ## 3. Merge `printer.cfg`
 

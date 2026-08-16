@@ -184,7 +184,7 @@ encoder_pins: ^EXP2_3, ^EXP2_5
 
 ### Stock display shows garbage during PRINT_START
 
-Remove undefined macros (`save_last_file`, undefined `PRINT_END`). Use Rex `display_macros.cfg` + fixed `GP3D_Macro.cfg`.
+Remove undefined macros (`save_last_file`, undefined `PRINT_END`). Use Rex `display_macros.cfg` with `pause_cancel_macros.cfg` for `END_PRINT`.
 
 ---
 
