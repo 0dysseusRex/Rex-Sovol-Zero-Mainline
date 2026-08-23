@@ -12,8 +12,12 @@ EDDY_CALIBRATE_PREP
 
 This macro:
 1. Homes XY
-2. Uses `SET_KINEMATIC_POSITION` + `RUN_PROBE_PRESSURE` to sync Z to bed contact
-3. Lifts to Z=5 for manual calibration
+2. Moves to the **load cell location (X25 Y20)** — not bed center
+3. Sets virtual Z with `SET_KINEMATIC_POSITION Z=25` so the load cell probe has enough downward travel even if the nozzle starts ~10–30 mm above the bed (override with `SYNC_Z=30` if needed)
+4. Uses `RUN_PROBE_PRESSURE` to sync Z to bed contact
+5. Lifts to Z=5 for calibration
+
+**Do not** use bed center (76.2, 76.2) — the load cell only triggers near X25 Y20.
 
 ### Step 2 — LDC drive current (once)
 
@@ -26,6 +30,8 @@ SAVE_CONFIG
 **Important:** Do not set `reg_drive_current` in `sovol_eddy.cfg`. If `SAVE_CONFIG` reports a conflict, comment out the hardcoded value and retry.
 
 ### Step 3 — Eddy height calibration
+
+**Option A — Paper test (stock mainline):**
 
 ```
 PROBE_EDDY_CURRENT_CALIBRATE CHIP=eddy
@@ -40,6 +46,26 @@ TESTZ Z=-0.1
 ACCEPT
 SAVE_CONFIG
 ```
+
+**Option B — Experimental load cell reference (no paper):**
+
+Requires `eddy_loadcell_calibrate.py` from `install-probe-pressure.sh`.
+
+```
+EDDY_CALIBRATE_LOADCELL
+SAVE_CONFIG
+```
+
+Or with explicit temperatures and sample count:
+
+```
+PROBE_EDDY_CURRENT_CALIBRATE_LOADCELL BED_TEMP=80 NOZZLE_TEMP=150 LC_SAMPLES=7
+SAVE_CONFIG
+```
+
+This heats the bed to 80°C and nozzle to **150°C** (same as print-start load cell touch), takes multiple load cell touches at **X25 Y20**, then builds the same `[probe_eddy_current eddy]` `calibrate` table as the paper method (~100 eddy frequency samples across 40 µm Z steps). Use **5–9** load cell touches (`LC_SAMPLES`); tighten `LC_TOLERANCE=0.03` if spread is high.
+
+Clean the nozzle before running — filament residue affects load cell contact height.
 
 ### Step 4 — Verify homing
 

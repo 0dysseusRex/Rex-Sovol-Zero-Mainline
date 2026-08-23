@@ -127,6 +127,7 @@ Press the knob to open **Main**. Submenus show **`..`** first to go back.
 | **Prepare → Calibration** | Load Cell Z Touch | `BED_LOADCELL_Z_OFFSET` |
 | **Prepare → Calibration** | Test Load Cell | `PROBE_LOAD_CELL` |
 | **Prepare → Calibration** | Eddy Cal Prep | `EDDY_CALIBRATE_PREP` |
+| **Prepare → Calibration** | Eddy Cal (Load Cell) | `EDDY_CALIBRATE_LOADCELL` (experimental) |
 | **Prepare → Calibration** | Axis Twist Cal | `AXIS_TWIST_COMPENSATION_CALIBRATE` |
 | **Tune** | Save Z Offset Now | `Z_OFFSET_APPLY_PROBE1` + `SAVE_CONFIG` |
 | **Tune → Save & Exit?** | End-Save Z-offs, End Print + Save Z, Move Z | `_SAVE_Z_LATER`, `END_PRINT_G` |

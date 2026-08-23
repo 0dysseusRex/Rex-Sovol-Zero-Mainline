@@ -18,5 +18,12 @@ ATC_SRC="$(cd "$(dirname "$0")/.." && pwd)/klipper/extras/axis_twist_pressure.py
 ATC_DEST="$KLIPPER_DIR/klippy/extras/axis_twist_pressure.py"
 cp "$ATC_SRC" "$ATC_DEST"
 echo "Installed axis_twist_pressure.py -> $ATC_DEST"
+
+ELC_SRC="$(cd "$(dirname "$0")/.." && pwd)/klipper/extras/eddy_loadcell_calibrate.py"
+ELC_DEST="$KLIPPER_DIR/klippy/extras/eddy_loadcell_calibrate.py"
+cp "$ELC_SRC" "$ELC_DEST"
+echo "Installed eddy_loadcell_calibrate.py -> $ELC_DEST"
+
 echo "Add to printer.cfg: [include probe_pressure.cfg]"
+echo "sovol_eddy.cfg includes [eddy_loadcell_calibrate] for experimental eddy cal."
 echo "Restart Klipper after copying config files."
