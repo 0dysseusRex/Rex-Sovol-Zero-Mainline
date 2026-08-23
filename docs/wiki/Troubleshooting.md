@@ -102,6 +102,24 @@ SAVE_CONFIG
 
 Run `EDDY_CALIBRATE_PREP` or `SET_KINEMATIC_POSITION Z=<known>`
 
+### `EDDY_CALIBRATE_PREP` reports touch Z ~10–15 mm / load cell did not touch bed
+
+Virtual Z reference too low — probe runs out of travel before reaching the bed. Retry with a higher starting reference:
+
+```
+EDDY_CALIBRATE_PREP SYNC_Z=35
+```
+
+Good touch Z is near **0 mm** (±0.2), not 10+ mm.
+
+### `Should set 'max_sensor_hz' to at least …`
+
+Your saved eddy `calibrate` table peaks above the configured `max_sensor_hz` in `sovol_eddy.cfg`. Raise it (e.g. **5930000** or slightly above the logged minimum), then `FIRMWARE_RESTART`. This is a runtime warning, not a calibration failure.
+
+### `Internal error` on `PROBE_EDDY_CURRENT_CALIBRATE_LOADCELL`
+
+Usually an outdated `eddy_loadcell_calibrate.py` on the host. Re-run `./scripts/install-probe-pressure.sh ~/klipper`, delete `~/klipper/klippy/extras/__pycache__/eddy_loadcell_calibrate*.pyc`, and `FIRMWARE_RESTART`.
+
 ---
 
 ## Pause → Cancel: “Move out of range” / heaters stay on

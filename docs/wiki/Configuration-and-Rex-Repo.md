@@ -52,7 +52,7 @@ cd Rex-Sovol-Zero-Mainline
 ./scripts/install-probe-pressure.sh ~/klipper
 ```
 
-**Why Python extras?** Mainline Klipper doesn't include Sovol's bed load cell module. This script copies `probe_pressure.py` and `axis_twist_pressure.py` into `~/klipper/klippy/extras/`.
+**Why Python extras?** Mainline Klipper doesn't include Sovol's bed load cell module. This script copies `probe_pressure.py`, `axis_twist_pressure.py`, and `eddy_loadcell_calibrate.py` into `~/klipper/klippy/extras/`.
 
 **Skip this entire step** if you have no load cell — you don't need `probe_pressure.py`. See [Eddy-Only Configuration](Eddy-Only-Configuration).
 
@@ -148,7 +148,7 @@ Quick summary — `display_macros.cfg` adds:
 **Control (top):** Front And Center, Clean Nozzle  
 **Temperature (top):** Chamber Preheat, Stop Preheat  
 **Filament:** load / unload 60 mm (fast and slow)  
-**Prepare → Calibration:** Load Cell Z Touch, Eddy Cal Prep, Axis Twist Cal, Test Load Cell  
+**Prepare → Calibration:** Load Cell Z Touch, Eddy Cal Prep, **Eddy Cal (Load Cell)**, Axis Twist Cal, Test Load Cell  
 **Tune:** Save Z Offset, End Print + Save Z  
 **Setup → Network:** Ethernet IP, Wi-Fi IP, SSID, Wi-Fi signal, mDNS hostname  
 **Setup → Chamber LED:** On / Off / Brightness %  
@@ -208,6 +208,7 @@ Mainsail → Machine tab → verify objects exist (Path A):
 - `probe_pressure`
 - `gcode_macro BED_LOADCELL_Z_OFFSET`
 - `gcode_macro EDDY_CALIBRATE_PREP`
+- `gcode_macro EDDY_CALIBRATE_LOADCELL` (experimental load-cell eddy cal)
 
 **Eddy-only:** only `probe_eddy_current eddy` is required — no `probe_pressure` objects.
 

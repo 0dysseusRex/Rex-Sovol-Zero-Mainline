@@ -14,13 +14,13 @@ Official eddy docs: [klipper3d.org — Eddy Probe](https://www.klipper3d.org/Edd
 ## Calibration order — Path A with load cell (do not skip steps)
 
 ```
-1. EDDY_CALIBRATE_PREP        (load cell bootstrap — once)
-2. LDC_CALIBRATE_DRIVE_CURRENT (once per machine)
-3. PROBE_EDDY_CURRENT_CALIBRATE (height map — per temp)
-4. G28 verify                 (eddy homing works)
-5. AXIS_TWIST_COMPENSATION_CALIBRATE  (X then Y)
-6. Load cell z_offset tune    (first print baby-step)
-7. PID / input shaper         (normal Klipper tuning)
+1. EDDY_CALIBRATE_PREP              (load cell bootstrap — once)
+2. LDC_CALIBRATE_DRIVE_CURRENT      (once per machine)
+3. Eddy height map                  (Option A: paper test, or Option B: load cell — see Step 3)
+4. G28 verify                       (eddy homing works)
+5. AXIS_TWIST_COMPENSATION_CALIBRATE (X then Y)
+6. Load cell z_offset tune          (first print baby-step)
+7. PID / input shaper               (normal Klipper tuning)
 ```
 
 Run from **Mainsail console** unless using display menus (Prepare → Calibration).
@@ -37,12 +37,14 @@ EDDY_CALIBRATE_PREP
 
 **What it does:**
 1. Homes XY  
-2. Positions over bed load cell area  
-3. `RUN_PROBE_PRESSURE` — nozzle touches bed gently  
-4. Sets kinematic Z from touch result  
-5. Lifts to safe height for eddy calibration  
+2. Moves to the **load cell location (X25 Y20)** — not bed center  
+3. Sets virtual Z with `SET_KINEMATIC_POSITION Z=25` so the load cell has enough downward travel (override with `SYNC_Z=30` if the nozzle starts very high)  
+4. `GET_PRESSURE_TARE` + `RUN_PROBE_PRESSURE` — nozzle touches bed gently  
+5. Aborts if touch Z > 1 mm (no real contact)  
+6. Sets kinematic Z from touch result  
+7. Lifts to Z=5 for eddy calibration  
 
-**Why:** Mainline Klipper won't Z-move until it believes Z is valid — load cell touch establishes that without eddy cal data.
+**Why:** Mainline Klipper won't Z-move until it believes Z is valid — load cell touch establishes that without eddy cal data. The load cell only triggers near **X25 Y20**; probing at bed center (76.2, 76.2) will fail or crash.
 
 **Display menu:** Prepare → Calibration → **Eddy Cal Prep**
 
@@ -75,6 +77,10 @@ Do **not** home between changing drive current and recalibrating — crash risk.
 
 ## Step 3 — Eddy height calibration
 
+Choose **one** method. Both write the same `[probe_eddy_current eddy]` `calibrate` table to `SAVE_CONFIG`.
+
+### Option A — Paper test (stock mainline)
+
 ```
 PROBE_EDDY_CURRENT_CALIBRATE CHIP=eddy
 ```
@@ -92,6 +98,36 @@ SAVE_CONFIG
 **Why small steps?** `-1` mm jumps can drive nozzle into bed.
 
 Calibrate at the **bed temperature you print at** (e.g. 90°C for ASA).
+
+### Option B — Load cell reference (experimental, no paper)
+
+Requires `eddy_loadcell_calibrate.py` from `install-probe-pressure.sh` (installed automatically with the Rex load cell extras).
+
+After Step 1 and Step 2:
+
+```
+EDDY_CALIBRATE_LOADCELL
+SAVE_CONFIG
+```
+
+Or with explicit options:
+
+```
+PROBE_EDDY_CURRENT_CALIBRATE_LOADCELL BED_TEMP=80 NOZZLE_TEMP=150 LC_SAMPLES=7
+SAVE_CONFIG
+```
+
+**What it does:**
+- Heats bed to 80°C and nozzle to **150°C** (same as print-start load cell touch)  
+- Takes **5–9** load cell touches at **X25 Y20** (spread must stay within tolerance)  
+- Builds the eddy frequency map (~100 samples across 40 µm Z steps)  
+- Prompts `SAVE_CONFIG` when done  
+
+**Tips:** Clean the nozzle first — filament residue affects touch height. Tighten `LC_TOLERANCE=0.03` if spread is high.
+
+**Display menu:** Prepare → Calibration → **Eddy Cal (Load Cell)**
+
+**After calibration:** If Klipper warns `Should set 'max_sensor_hz' to at least …`, raise `max_sensor_hz` in `sovol_eddy.cfg` above the peak frequency in your saved `calibrate` table (Rex default: **5930000**), then `FIRMWARE_RESTART`.
 
 ---
 
