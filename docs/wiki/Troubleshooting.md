@@ -122,6 +122,14 @@ Usually an outdated `eddy_loadcell_calibrate.py` on the host. Re-run `./scripts/
 
 ---
 
+## Filament runout does not pause
+
+**Cause:** Stock Zero config sets `pause_on_runout: False` and used Sovol-only `CONTINUE_PRINT_D` (not in mainline). With no `runout_gcode`, the switch is display-only.
+
+**Fix:** Keep `pause_on_runout: False` and add `runout_gcode: PAUSE STATE=filament_change` so Rex `PAUSE` parks and unloads. Confirm `[filament_switch_sensor filament_sensor]` `switch_pin: PB2` and that `PRINT_START` enables the sensor.
+
+---
+
 ## Pause → Cancel: “Move out of range” / heaters stay on
 
 **Symptoms:** After **Pause** then **Cancel**, Klipper reports `Move out of range` (often `Y=152.526` or `X=-10.025`). Toolhead won’t home or jog; bed/nozzle stay hot.

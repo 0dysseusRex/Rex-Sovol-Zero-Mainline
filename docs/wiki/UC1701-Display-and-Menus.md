@@ -74,8 +74,13 @@ Sensor config (in `printer.cfg`):
 
 ```ini
 [filament_switch_sensor filament_sensor]
+pause_on_runout: False
 switch_pin: PB2
+runout_gcode:
+    PAUSE STATE=filament_change
 ```
+
+`pause_on_runout` stays **False** so Rex `PAUSE` can park and do the filament-change retract. The sensor still pauses the job via `runout_gcode`.
 
 #### Chamber temperature — row 1, right
 
