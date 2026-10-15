@@ -231,6 +231,41 @@ END_PRINT
 
 If your slicer profile has no chamber variable, use `CHAMBER=0`.
 
+#### Chamber target and wait temperature
+
+For a positive `CHAMBER` value, `PRINT_START` calls `M141` and `M191` from
+[`config/chamber_macros.cfg`](config/chamber_macros.cfg). The wait uses the rear
+chamber sensor. Its minimum is the target **minus the saved tolerance**
+(`ch_wtol`, default 10°C), so `CHAMBER=40` normally waits for at least 30°C,
+not 40°C. The chamber controller still uses the 40°C target.
+
+The direct commands distinguish control from waiting:
+
+| Command | Behavior |
+|---|---|
+| `M141 S40` | Set the chamber control target to 40°C without waiting for it. |
+| `M191 S40` | Set the target and wait for at least `40 - tolerance` °C. |
+| `M191 R40` | Set the target and wait within `40 ± tolerance` °C. |
+| `M191 S40 TOL2` | Wait for at least 38°C and save a 2°C tolerance for subsequent waits. |
+| `M141 S0` | Turn chamber control off without a wait. |
+
+`M191` uses traditional G-code parameter syntax: write `TOL2`, not `TOL=2`.
+`TOL` is persistent: after the example with `TOL2`, a later `M191 S40` or
+`PRINT_START … CHAMBER=40` also waits for at least 38°C. Setting `TOL10` on a
+later `M191` call restores the default tolerance **and performs that call's
+wait**. These temperatures illustrate command semantics, not material presets.
+
+`PRINT_START … CHAMBER=0` (or omitting `CHAMBER`) skips the chamber commands;
+it does **not** issue `M141 S0` or explicitly stop previously active control.
+Use `M141 S0` when an explicit off command is intended. It stops the chamber
+controller/exhaust and an optional chamber heater; it does not turn off the bed
+or hotend or reset the saved wait tolerance.
+
+For positive targets, `M141` also enables stirring. Its calculated bed-target
+fallback runs only when the bed target is zero. Normal `PRINT_START` with a
+positive `BED` value has already set and waited for that bed target before the
+chamber commands, so this fallback does not boost the bed in that sequence.
+
 </details>
 
 ## Credits
