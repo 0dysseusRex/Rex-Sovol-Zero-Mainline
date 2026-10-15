@@ -221,6 +221,18 @@ LINE_PURGE PURGE=0    ; skip once
 
 Defaults (`line_purge.cfg`): 25 mm margin from object bounds, 48 mm purge length, 12 mm³/s flow, fallback corner X15 Y15 when no object data.
 
+Placement reserves the full purge length plus the 10 mm wipe within XY travel
+limits, excluding negative machine coordinates used for nozzle cleaning. It
+tries in front of the objects, then to their left, preserving the requested
+margin. If neither fits, the macro reports an error before moving; reposition
+the objects or reduce `PURGE_AMOUNT` / `PURGE_MARGIN`. With no usable object
+polygons, the fixed fallback is clamped to fit the complete path, or rejected if
+the X travel is too short. These checks do not account for skirts or brims that
+are absent from object polygons.
+
+Offline regression checks (requires Jinja2):
+`python -m unittest discover -s tests -v`.
+
 ### Slicer start / end g-code
 
 Replace the long OEM Sovol block (M140/M190, double G28, manual purge lines, M104/M109) with:
