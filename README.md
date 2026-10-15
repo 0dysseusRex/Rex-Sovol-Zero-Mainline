@@ -172,19 +172,30 @@ canbus_uuid: <your toolhead mcu>
 Optional quality-of-life additions included in this repo. Not required for eddy + load cell probing.
 
 <details>
-<summary>Brass wire brush nozzle clean (optional hardware mod)</summary>
+<summary>Nozzle cleaning: brass + silicone or silicone only</summary>
 
-The default `CLEAN_NOZZLE` macro matches **stock Sovol** — silicone wiper pad only ([OEM Macro.cfg](https://github.com/Sovol3d/SOVOL-ZERO/blob/main/sovol/printer_data/config/Macro.cfg), adapted for mainline by omitting `RUN_PROBE_VIR_CONTACT`).
-
-If you install the community **brass wire brush** mount:
+The active `CLEAN_NOZZLE` in [`config/Macro.cfg`](config/Macro.cfg) uses **both a
+brass brush and the stock silicone wiper**. It assumes the brass brush hardware
+is installed:
 
 **[Sovol Zero brass brush — MakerWorld](https://makerworld.com/en/models/2225406-sovol-zero-brass-brush)**
 
-1. Open `config/Macro.cfg`
-2. Comment out the active `[gcode_macro CLEAN_NOZZLE]` block
-3. Uncomment `[gcode_macro CLEAN_NOZZLE_BRASS]` and rename it to `CLEAN_NOZZLE` (or call `CLEAN_NOZZLE_BRASS` from `PRINT_START` and the display menu)
+This sequence heats to 250°C, brushes at `X-9.5` while cooling toward 160°C,
+then waits for 130°C and finishes on the silicone wiper. Silicone cleaning
+remains part of the active routine.
 
-The brass macro heats to 250°C, scrubs on the brush at `X-10`, then finishes on the OEM silicone wiper before load cell probing.
+For a printer with **only the stock silicone wiper**, select the bundled
+silicone-only alternative:
+
+1. Open `config/Macro.cfg`.
+2. Comment out the entire active `[gcode_macro CLEAN_NOZZLE]` block.
+3. Uncomment the entire `[gcode_macro CLEAN_NOZZLE_OEM]` block, preserving its
+   indentation, and rename its header to `[gcode_macro CLEAN_NOZZLE]`.
+4. Keep exactly one active `CLEAN_NOZZLE` definition when merging into your
+   configuration. `PRINT_START` and the display menu can keep calling that name.
+
+Both supplied sequences call `NOZZLE_BED_COOLDOWN TEMP=100` after wiping and
+use the load-cell helpers in `config/probe_pressure.cfg`.
 
 </details>
 
