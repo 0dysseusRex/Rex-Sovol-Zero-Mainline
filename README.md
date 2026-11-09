@@ -228,7 +228,8 @@ margin. If neither fits, the macro reports an error before moving; reposition
 the objects or reduce `PURGE_AMOUNT` / `PURGE_MARGIN`. With no usable object
 polygons, the fixed fallback is clamped to fit the complete path, or rejected if
 the X travel is too short. These checks do not account for skirts or brims that
-are absent from object polygons.
+are absent from object polygons. `PURGE_MARGIN=0` runs the line along the edge
+of the object bounds; with a brim or skirt, keep the margin wider than both.
 
 Offline regression checks (requires Jinja2):
 `python -m unittest discover -s tests -v`.

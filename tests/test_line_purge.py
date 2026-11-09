@@ -120,6 +120,14 @@ class LinePurgeTest(unittest.TestCase):
         start, _, _ = self.check_moves(self.render([rectangle(10, 25, 30, 40)]))
         self.assertEqual(start["Y"], 0)
 
+    def test_zero_margin_runs_along_object_bounds(self):
+        start, end, wipe = self.check_moves(self.render(
+            [rectangle(60, 70, 90, 90)], purge_margin=0))
+        self.assertEqual((start["X"], start["Y"], end["X"], wipe["X"]), (51, 70, 99, 109))
+        start, end, wipe = self.check_moves(self.render(
+            [rectangle(30, 70, 40, 80)], bounds=(0, 0, 50, 153), purge_margin=0))
+        self.assertEqual((start["X"], start["Y"], end["Y"], wipe["Y"]), (30, 51, 99, 109))
+
     def test_fixed_fallback_control(self):
         start, end, wipe = self.check_moves(self.render())
         self.assertEqual((start["X"], start["Y"], end["X"], wipe["X"]), (15, 15, 63, 73))
