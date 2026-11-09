@@ -284,6 +284,13 @@ Use `M141 S0` when an explicit off command is intended. It stops the chamber
 controller/exhaust and an optional chamber heater; it does not turn off the bed
 or hotend or reset the saved wait tolerance.
 
+The exhaust controller runs every 60 s while chamber control is on. Once
+nothing heats the chamber - the bed target is 0 and any chamber heater is
+off, as after `END_PRINT` - it stops itself when the chamber falls 3°C below
+its target. While the bed or chamber heater is on, it keeps running through
+a dip such as an opened door. The fan and sensor sections it needs are listed
+at the top of [`config/chamber_macros.cfg`](config/chamber_macros.cfg).
+
 For positive targets, `M141` also enables stirring. Its calculated bed-target
 fallback runs only when the bed target is zero. Normal `PRINT_START` with a
 positive `BED` value has already set and waited for that bed target before the
@@ -296,6 +303,7 @@ chamber commands, so this fallback does not boost the bed in that sequence.
 - `probe_pressure.py` — derived from Sovol OEM Klipper (GPLv3), based on upstream Klipper probe code
 - `axis_twist_pressure.py` — GPLv3; patches mainline axis twist cal to use load cell nozzle touch
 - `line_purge.cfg` — adapted from [pellcorp/creality](https://github.com/pellcorp/creality) (SimpleAF) `_LINE_PURGE` and KAMP
+- `chamber_macros.cfg` — exhaust PI loop and `M141`/`M191` from rpcyan's [PID Controlled Exhaust Fan](https://forum.sovol3d.com/t/9025) forum thread
 
 ## License
 
