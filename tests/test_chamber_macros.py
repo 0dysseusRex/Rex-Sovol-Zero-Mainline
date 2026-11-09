@@ -54,7 +54,7 @@ class Printer:
             elif kind == "delayed_gcode":
                 self.delayed[name] = config[section]["gcode"]
         self.now, self.timers, self.active = 0.0, {}, []
-        self.saves, self.messages, self.log = 0, [], []
+        self.saves, self.messages, self.log, self.waits = 0, [], [], []
 
     @property
     def state(self):
@@ -112,7 +112,19 @@ class Printer:
             self.status["extruder"]["target"] = float(params.get("S", 0))
         elif cmd == "RESPOND":
             self.messages.append(params.get("MSG", ""))
-        elif cmd in ("M400", "TEMPERATURE_WAIT"):
+        elif cmd == "TEMPERATURE_WAIT":
+            # The wait holds the gcode mutex, so no timer fires during it:
+            # record what the printer holds for its whole length.
+            heater = self.status.get("heater_generic chamber_heater")
+            self.waits.append({
+                "params": params,
+                "exhaust": self.status["fan_generic exhaust_fan"]["speed"],
+                "part_fan": self.status["fan_generic part_cooling_fan"]["speed"],
+                "hotend": self.status["extruder"]["target"],
+                "heater": heater["target"] if heater else None,
+                "timer": "CHAMBER_TIMER" in self.timers,
+            })
+        elif cmd == "M400":
             pass
         else:
             raise MacroError("Unknown command: " + line)
@@ -230,6 +242,72 @@ class ChamberLoopTest(unittest.TestCase):
         printer.command("M141 S0")
         self.assertNotIn("CHAMBER_TIMER", printer.timers)
         self.assertEqual(printer.state["running"], 0)
+
+    def test_m191_heat_up_stops_the_exhaust_for_the_wait(self):
+        printer = self.primed_print()
+        printer.heat(44.0)
+        printer.advance(60)                 # the loop opens the exhaust
+        self.assertGreater(printer.status["fan_generic exhaust_fan"]["speed"], 0.0)
+        printer.heat(30.0)                  # the next job starts colder
+        printer.command("M191 S45")
+        wait = printer.waits[-1]
+        self.assertEqual(wait["exhaust"], 0.0)
+        self.assertFalse(wait["timer"])
+        self.assertEqual(printer.state["running"], 1)
+        self.assertIn("CHAMBER_TIMER", printer.timers)
+
+    def test_m191_keeps_the_chamber_heater_for_the_wait(self):
+        printer = Printer(heater=True)
+        printer.command("M140 S100")
+        printer.command("M191 S45")
+        self.assertEqual(printer.waits[-1]["heater"], 45.0)
+        self.assertEqual(printer.status["heater_generic chamber_heater"]["target"], 45.0)
+
+    def test_m191_range_wait_leaves_the_loop_running(self):
+        printer = self.primed_print()
+        printer.command("M191 R40")
+        self.assertIn("MAXIMUM", printer.waits[-1]["params"])
+        self.assertTrue(printer.waits[-1]["timer"])
+
+    def test_m141_alone_does_not_stir(self):
+        printer = Printer()
+        printer.command("M140 S100")
+        printer.command("M141 S40")
+        self.assertEqual(printer.status["fan_generic part_cooling_fan"]["speed"], 0.0)
+        self.assertEqual(printer.status["extruder"]["target"], 0.0)
+
+    def test_m191_stirs_only_while_waiting(self):
+        printer = Printer()
+        printer.command("M140 S100")
+        printer.command("M191 S45")
+        self.assertEqual((printer.waits[-1]["part_fan"], printer.waits[-1]["hotend"]), (1.0, 46.0))
+        self.assertEqual(printer.status["fan_generic part_cooling_fan"]["speed"], 0.0)
+
+    def test_m191_leaves_a_running_part_fan_alone(self):
+        printer = Printer()
+        printer.command("SET_FAN_SPEED FAN=part_cooling_fan SPEED=0.5")
+        printer.command("M191 S45")
+        self.assertEqual(printer.waits[-1]["part_fan"], 0.5)
+        self.assertEqual(printer.status["fan_generic part_cooling_fan"]["speed"], 0.5)
+
+    def print_start_chamber_lines(self, rawparams):
+        """PRINT_START reads only its params, so rendering it shows what it sends."""
+        config = configparser.RawConfigParser(strict=False, inline_comment_prefixes=(";", "#"))
+        config.read(CONFIG_DIR / "Macro.cfg", encoding="utf-8")
+        params = {key.upper(): value for key, value in re.findall(r"(\w+)=(\S+)", rawparams)}
+        out = jinja2.Environment("{%", "%}", "{", "}").from_string(
+            config["gcode_macro PRINT_START"]["gcode"]).render(params=params, rawparams=rawparams)
+        return [line.strip() for line in out.splitlines() if re.match(r"\s*M1[49]1\b", line)]
+
+    def test_print_start_chamber_zero_turns_control_off(self):
+        self.assertEqual(self.print_start_chamber_lines("BED=60 HOTEND=220 CHAMBER=0"), ["M141 S0"])
+
+    def test_print_start_without_chamber_leaves_control_alone(self):
+        self.assertEqual(self.print_start_chamber_lines("BED=60 HOTEND=220"), [])
+
+    def test_print_start_chamber_target_heats_and_waits(self):
+        self.assertEqual(self.print_start_chamber_lines("BED=100 HOTEND=250 CHAMBER=40"),
+                         ["M141 S40.0", "M191 S40.0"])
 
     def test_status_reports_state(self):
         printer = self.primed_print()

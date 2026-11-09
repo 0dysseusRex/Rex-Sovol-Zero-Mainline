@@ -268,7 +268,7 @@ The direct commands distinguish control from waiting:
 | Command | Behavior |
 |---|---|
 | `M141 S40` | Set the chamber control target to 40°C without waiting for it. |
-| `M191 S40` | Set the target and wait for at least `40 - tolerance` °C. |
+| `M191 S40` | Set the target and wait for at least `40 - tolerance` °C. The exhaust is off for the wait, and control restarts when it ends. |
 | `M191 R40` | Set the target and wait within `40 ± tolerance` °C. |
 | `M191 S40 TOL2` | Wait for at least 38°C and save a 2°C tolerance for subsequent waits. |
 | `M141 S0` | Turn chamber control off without a wait. |
@@ -279,9 +279,9 @@ The direct commands distinguish control from waiting:
 later `M191` call restores the default tolerance **and performs that call's
 wait**. These temperatures illustrate command semantics, not material presets.
 
-`PRINT_START … CHAMBER=0` (or omitting `CHAMBER`) skips the chamber commands;
-it does **not** issue `M141 S0` or explicitly stop previously active control.
-Use `M141 S0` when an explicit off command is intended. It stops the chamber
+`PRINT_START … CHAMBER=0` issues `M141 S0`, so control left running by an
+earlier job stops. Omitting `CHAMBER` skips the chamber commands and leaves
+control as it was. `M141 S0` stops the chamber
 controller/exhaust and an optional chamber heater; it does not turn off the bed
 or hotend or reset the saved wait tolerance.
 
@@ -292,8 +292,11 @@ its target. While the bed or chamber heater is on, it keeps running through
 a dip such as an opened door. The fan and sensor sections it needs are listed
 at the top of [`config/chamber_macros.cfg`](config/chamber_macros.cfg).
 
-For positive targets, `M141` also enables stirring. Its calculated bed-target
-fallback runs only when the bed target is zero. Normal `PRINT_START` with a
+`M191` stirs while it waits. It runs the part fan at full if it was off, and
+raises the hotend to 46°C if it was lower, so the heat-break fan runs. The part
+fan goes back off after the wait. The hotend stays at 46°C until `PRINT_START`
+heats it for cleaning. A bare `M141` doesn't stir. `M141`'s calculated
+bed-target fallback runs only when the bed target is zero. Normal `PRINT_START` with a
 positive `BED` value has already set and waited for that bed target before the
 chamber commands, so this fallback does not boost the bed in that sequence.
 
