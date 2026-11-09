@@ -133,7 +133,7 @@ gcode:
         M190 S{bed}
     {% endif %}
 
-    # Optional — OEM silicone wipe; brass brush mod: use CLEAN_NOZZLE_BRASS instead
+    # Optional — brass brush + silicone; silicone only: CLEAN_NOZZLE_OEM (see README)
     CLEAN_NOZZLE
 
     {% if hotend > 0 %}
@@ -145,6 +145,8 @@ gcode:
     BED_MESH_CLEAR
     BED_MESH_CALIBRATE
 ```
+
+**`CLEAN_NOZZLE` without `probe_pressure.cfg`:** both supplied cleaning macros end with `NOZZLE_BED_COOLDOWN TEMP=100`, which is defined in `probe_pressure.cfg` and touches the nozzle down with `RUN_PROBE_PRESSURE`. Without that file Klipper prints `Unknown command` and skips the cooldown. Delete that line from your copy of `CLEAN_NOZZLE`, or leave the `CLEAN_NOZZLE` call out.
 
 **Why no load cell block?** Fine Z is already encoded in eddy `calibrate` / tap data from `PROBE_EDDY_CURRENT_CALIBRATE`. Mesh runs at print temperature after homing.
 
@@ -267,6 +269,7 @@ gcode:
 |---|---|
 | `Unknown command: RUN_PROBE_PRESSURE` | You still have load cell macros — remove `probe_pressure.cfg` |
 | `Unknown command: GET_PRESSURE_TARE` | Same — drop load cell includes |
+| `Unknown command: NOZZLE_BED_COOLDOWN` | `CLEAN_NOZZLE` still ends with the `probe_pressure.cfg` cooldown — delete that line |
 | First layer consistently off | Re-run eddy tap cal at print bed temp; adjust `SET_GCODE_OFFSET` |
 | `EDDY_CALIBRATE_PREP` crashes | Macro still uses load cell — use eddy-only `EDDY_CALIBRATE_PREP` above |
 | Axis twist cal crashes at nozzle points | Using Rex load-cell twist config — switch to stock axis twist or skip |

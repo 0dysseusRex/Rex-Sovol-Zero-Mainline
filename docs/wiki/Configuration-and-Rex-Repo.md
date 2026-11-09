@@ -129,7 +129,7 @@ From [Rex Macro.cfg template](https://github.com/0dysseusRex/Rex-Sovol-Zero-Main
 |---|---|
 | `G28` | Safe Z homing until eddy calibrated |
 | `PRINT_START` / `START_PRINT` | Bed heat → nozzle clean → load cell Z → mesh |
-| `CLEAN_NOZZLE` | OEM silicone wiper before probing (optional `CLEAN_NOZZLE_BRASS` for brush mod) |
+| `CLEAN_NOZZLE` | Brass brush + OEM silicone wiper before probing (silicone only: `CLEAN_NOZZLE_OEM`, see README) |
 
 **Pause / cancel / end:** use `[include pause_cancel_macros.cfg]` after `Macro.cfg` — do **not** also define `PAUSE`, `CANCEL_PRINT`, or `END_PRINT` in `Macro.cfg`.
 
